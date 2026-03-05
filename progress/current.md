@@ -2,9 +2,9 @@
 
 ## 현재 상태
 
-- **단계**: Phase 1~3 구현 완료 (M1~M8). Playwright E2E 검증 완료.
-- **완료**: DB 스키마, 봇 마이그레이션(TS), Puppeteer 강화(메타추출), Next.js 웹앱(인증+갤러리+상세+평가+대시보드), E2E 테스트
-- **검증**: Playwright 22/23 테스트 통과 (1개는 테스트 로케이터 이슈, 앱 버그 아님). 수정 후 7/7 검증 통과.
+- **단계**: Phase 1~3 구현 완료 (M1~M8) + UI 퀄리티 엘리베이션 완료.
+- **완료**: DB 스키마, 봇 마이그레이션(TS), Puppeteer 강화(메타추출), Next.js 웹앱(인증+갤러리+상세+평가+대시보드), E2E 테스트, UI 프리미엄 리디자인
+- **검증**: Playwright 16/16 E2E 테스트 통과. 빌드 성공.
 - **기존 자산**: ref-001, ref-002 DB 마이그레이션 완료. 스크린샷 새 경로로 복사됨.
 - **다음**: Phase 4 (M9: 에이전트 DB 연동) + Phase 5 (M10: 배포)
 - **블로커**: 없음
@@ -26,6 +26,19 @@
 ### Phase 3: 인터랙션 (완료)
 - [x] M7: 평가 시스템 (verdict + 해시태그 + taste_log)
 - [x] M8: 대시보드 (통계 + 미평가 CTA + 인기 태그)
+
+### UI 퀄리티 엘리베이션 (완료, Ralph Loop 10회)
+- [x] 로그인: 그래디언트 배경, 글래스모피즘, Google 아이콘
+- [x] 갤러리 카드: 호버 엘리베이션, 스켈레톤 로딩, verdict 배지
+- [x] 헤더: 로고 마크, 미평가 펄스 인디케이터
+- [x] 대시보드: StatCard 아이콘, 진행률 바, 접기 애니메이션
+- [x] 필터바: 세그먼트 컨트롤, 검색 아이콘
+- [x] 상세 페이지: 디바이스 아이콘, verdict 아이콘, 컬러 스와치 복사
+- [x] 해시태그: 키보드 네비게이션, 해시 아이콘
+- [x] 모바일 바텀 네비게이션 (4탭)
+- [x] 404 페이지, 빈 상태, 스크롤 투 탑
+- [x] focus-visible 링, lazy loading, 카드 진입 애니메이션
+- [x] iOS safe area, 터치 타겟 48px
 
 ### Phase 4: 에이전트 통합 (미착수)
 - [ ] M9: 에이전트 DB 연동 + 패턴 추출
@@ -69,11 +82,11 @@ npm run build
 | 03-06 | Tailwind CSS v4 + @tailwindcss/postcss | tailwind.config 불필요, CSS-first 설정 |
 | 03-06 | NextAuth v5 beta | App Router 네이티브 지원 |
 | 03-06 | Server Component + Client Component 분리 | 메인/상세 페이지 SSR + 인터랙션 CSR |
-| 03-06 | 기존 마크다운 ref를 DB로 마이그레이션 | 스크립트로 자동화 |
 | 03-06 | Playwright E2E 테스트 도입 | 자동 페이지 검증, SKIP_AUTH 환경변수로 dev 바이패스 |
-| 03-06 | verdict에 "삭제" 옵션 추가 | spec 요구사항 (like/dislike/delete) |
-| 03-06 | 필터 전환 시 로딩 깜빡임 제거 | 이전 데이터 유지하면서 fetch |
-| 03-06 | 모바일 상세 헤더 최적화 | 텍스트 truncate, "열기" 축약 |
+| 03-06 | Ralph Loop 10회로 UI 퀄리티 엘리베이션 | monet.design 벤치마크 수준으로 |
+| 03-06 | 모바일 바텀 네비 도입 | CLAUDE.md 디바이스별 UX 원칙 준수 |
+| 03-06 | white/[opacity] 컬러 패턴 통일 | 다크 테마에서 일관된 표면 계층 |
+| 03-06 | 순수 Tailwind (shadcn/ui 미사용) | 의존성 최소화, 커스텀 자유도 |
 
 ---
 
