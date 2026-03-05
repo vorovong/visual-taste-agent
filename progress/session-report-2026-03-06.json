@@ -1,0 +1,234 @@
+{
+  "session": {
+    "date": "2026-03-06",
+    "scope": "M1~M8 (Phase 1~3) end-to-end 구현",
+    "result": "SUCCESS",
+    "build_status": "PASS",
+    "type_check_status": "PASS",
+    "db_migration_status": "PASS"
+  },
+  "milestones_completed": [
+    {
+      "id": "M1",
+      "name": "DB 스키마 + 공유 라이브러리",
+      "files_created": [
+        "lib/db/schema.ts",
+        "lib/db/index.ts",
+        "lib/db/migrate.ts",
+        "lib/types.ts",
+        "drizzle.config.ts",
+        "tsconfig.json"
+      ],
+      "dependencies_added": [
+        "drizzle-orm",
+        "better-sqlite3",
+        "typescript",
+        "tsx",
+        "drizzle-kit"
+      ]
+    },
+    {
+      "id": "M2",
+      "name": "봇 마이그레이션",
+      "files_created": ["bot/index.ts", "bot/handlers/collect.ts"],
+      "files_superseded": ["bot/index.js", "bot/handlers/collect.js", "bot/lib/reference.js"],
+      "changes": [
+        "JS -> TS 전환",
+        "마크다운 저장 -> SQLite DB 저장",
+        "v2 플로우: URL -> 캡쳐 -> pending (평가 단계 제거)",
+        "chat_id 화이트리스트 적용",
+        "drizzle-orm 쿼리로 전환"
+      ]
+    },
+    {
+      "id": "M3",
+      "name": "Puppeteer 강화",
+      "files_created": ["lib/capture/index.ts"],
+      "files_superseded": ["scripts/capture.js"],
+      "changes": [
+        "디자인 메타데이터 자동 추출 (colors, fonts, layout, framework)",
+        "X-Frame-Options + CSP 헤더 체크 -> iframe_allowed 플래그",
+        "페이지 title 자동 추출",
+        "TypeScript 전환"
+      ]
+    },
+    {
+      "id": "M4",
+      "name": "Next.js 스캐폴딩 + 인증",
+      "files_created": [
+        "next.config.ts",
+        "postcss.config.mjs",
+        "middleware.ts",
+        "lib/auth.ts",
+        "app/layout.tsx",
+        "app/globals.css",
+        "app/login/page.tsx",
+        "app/api/auth/[...nextauth]/route.ts"
+      ],
+      "dependencies_added": [
+        "next@15",
+        "react@19",
+        "react-dom@19",
+        "next-auth@beta",
+        "tailwindcss@4",
+        "@tailwindcss/postcss"
+      ]
+    },
+    {
+      "id": "M5",
+      "name": "갤러리",
+      "files_created": [
+        "app/page.tsx",
+        "app/gallery-client.tsx",
+        "app/components/reference-card.tsx",
+        "app/components/filter-bar.tsx",
+        "app/components/header.tsx",
+        "app/api/references/route.ts"
+      ]
+    },
+    {
+      "id": "M6",
+      "name": "상세 페이지",
+      "files_created": [
+        "app/ref/[id]/page.tsx",
+        "app/ref/[id]/detail-client.tsx",
+        "app/api/references/[id]/route.ts"
+      ]
+    },
+    {
+      "id": "M7",
+      "name": "평가 시스템",
+      "files_created": [
+        "app/components/hashtag-input.tsx",
+        "app/api/references/[id]/hashtags/route.ts",
+        "app/api/hashtags/route.ts"
+      ],
+      "features": [
+        "verdict (like/dislike) 토글 with taste_log 기록",
+        "해시태그 추가/삭제 with usage_count 관리",
+        "그리드에서 빠른 verdict (hover 시 좋아요/싫어요 버튼)",
+        "해시태그 자동완성 (usage_count 순 정렬)"
+      ]
+    },
+    {
+      "id": "M8",
+      "name": "대시보드",
+      "files_created": [
+        "app/components/dashboard.tsx",
+        "app/api/stats/route.ts"
+      ],
+      "features": [
+        "총 레퍼런스/좋아요/싫어요/미평가 통계",
+        "미평가 CTA (클릭 시 필터)",
+        "인기 태그 목록 (클릭 시 필터)",
+        "접기/펼치기 토글"
+      ]
+    }
+  ],
+  "edge_cases_and_solutions": [
+    {
+      "issue": "SQLite 'references' 예약어 충돌",
+      "symptom": "CREATE TABLE references 실행 시 syntax error",
+      "solution": "테이블명을 큰따옴표로 감쌈: CREATE TABLE \"references\"",
+      "impact": "마이그레이션 SQL 전체, FK 참조 포함",
+      "lesson": "SQLite에서 references, order, group 등은 예약어. Drizzle ORM은 자동으로 처리하지만, raw SQL 마이그레이션은 수동 이스케이프 필요"
+    },
+    {
+      "issue": "Next.js에서 .js 확장자 import 실패",
+      "symptom": "Module not found: Can't resolve './schema.js'",
+      "solution": "모든 내부 import에서 .js 확장자 제거",
+      "impact": "lib/ 및 bot/ 하위 모든 import문",
+      "lesson": "Next.js webpack은 .ts -> .js resolve를 하지 않음. tsx 런타임은 확장자 유무 모두 지원하므로, 확장자 없이 통일하는 것이 안전"
+    },
+    {
+      "issue": "Tailwind CSS v4는 tailwind.config.js 불필요",
+      "symptom": "v4에서는 CSS-first 설정 (@import 'tailwindcss')",
+      "solution": "postcss.config.mjs에 @tailwindcss/postcss 플러그인만 설정",
+      "lesson": "Tailwind v4는 설정 패러다임이 바뀜. tailwind.config.ts/js 파일이 아닌 CSS 내 @theme으로 커스터마이징"
+    },
+    {
+      "issue": "better-sqlite3 Node.js native addon → Next.js 서버 번들 문제",
+      "symptom": "서버 컴포넌트에서 better-sqlite3 import 시 webpack 경고",
+      "solution": "next.config.ts에 serverExternalPackages: ['better-sqlite3'] 추가",
+      "lesson": "native addon은 webpack으로 번들링 불가. serverExternalPackages로 제외해야 함"
+    },
+    {
+      "issue": "기존 마크다운 ref 데이터 DB 마이그레이션",
+      "symptom": "ref-001, ref-002의 frontmatter 파싱 필요",
+      "solution": "scripts/migrate-refs.ts 전용 마이그레이션 스크립트 작성",
+      "lesson": "기존 자산은 스크립트로 마이그레이션하되, 스크린샷 파일 경로도 새 구조(public/screenshots/{id}/)로 복사 필요"
+    }
+  ],
+  "tradeoffs": [
+    {
+      "decision": "Raw SQL 마이그레이션 vs Drizzle Kit 마이그레이션",
+      "chose": "Raw SQL (lib/db/migrate.ts)",
+      "reason": "단일 사용자 프로젝트에서 Drizzle Kit의 마이그레이션 폴더 관리 오버헤드 불필요. CREATE TABLE IF NOT EXISTS로 멱등성 확보. 스키마 변경 시 직접 ALTER TABLE 추가하면 됨.",
+      "risk": "스키마 복잡해지면 Drizzle Kit으로 전환 고려"
+    },
+    {
+      "decision": "Server Component + Client Component 분리 패턴",
+      "chose": "페이지는 Server Component (DB 직접 접근), 인터랙션은 Client Component",
+      "reason": "갤러리/상세 페이지의 초기 데이터는 SSR로 빠르게 로드. 필터 변경/평가 등 인터랙션은 API route 통해 CSR.",
+      "risk": "SSR 데이터와 CSR 데이터 불일치 가능 → router.refresh()나 revalidate로 해결"
+    },
+    {
+      "decision": "API route에서 N+1 쿼리 vs JOIN",
+      "chose": "references 조회 후 각각 screenshots/hashtags 조회 (N+1)",
+      "reason": "단일 사용자, 레퍼런스 수십~수백 개 규모에서 성능 이슈 없음. 코드 가독성 우선.",
+      "risk": "1000개 이상이면 JOIN으로 전환 필요. 그때 Drizzle의 relationalQuery 활용"
+    },
+    {
+      "decision": "해시태그 usage_count 실시간 관리 vs 배치 집계",
+      "chose": "실시간 증감 (POST/DELETE 시 ±1)",
+      "reason": "태그 추가/삭제가 빈번하지 않은 시나리오. 정확성 우선.",
+      "risk": "동시성 문제는 SQLite WAL 모드로 충분히 커버"
+    },
+    {
+      "decision": "봇과 웹앱이 같은 SQLite 파일 공유",
+      "chose": "단일 vta.db 파일, WAL 모드 + FK ON",
+      "reason": "단일 사용자, 쓰기 빈도 낮음 (봇: 수집 시만, 웹앱: 평가 시만). WAL 모드로 동시 읽기/쓰기 지원.",
+      "risk": "프로세스 간 파일 잠금 충돌 가능성은 있으나 WAL이 해결. 배포 시 같은 서버에서 실행 전제."
+    }
+  ],
+  "critical_knowledge": [
+    {
+      "topic": "프로젝트 실행 구조",
+      "detail": "2개 프로세스: (1) tsx bot/index.ts (텔레그램봇, 상시 실행), (2) next dev/start (웹앱). 둘 다 data/vta.db 공유."
+    },
+    {
+      "topic": "인증 플로우",
+      "detail": "middleware.ts가 모든 요청 가로채서 /login, /api/auth, /_next, /screenshots 외에는 세션 체크. 미인증 시 /login으로 307 리다이렉트."
+    },
+    {
+      "topic": "스크린샷 서빙",
+      "detail": "public/screenshots/{refId}/{viewport}.png 구조. Next.js의 public/ 정적 파일 서빙 활용. .gitignore에 public/screenshots/ 포함."
+    },
+    {
+      "topic": "v1 -> v2 전환 시 주의",
+      "detail": "bot/index.js, bot/handlers/collect.js, bot/lib/reference.js, scripts/capture.js는 이제 사용하지 않음. .ts 파일로 대체됨. 단, 이전 JS 파일은 아직 삭제하지 않음 (안전을 위해)."
+    },
+    {
+      "topic": "Tailwind CSS v4 설정",
+      "detail": "tailwind.config.ts 없음. postcss.config.mjs에 @tailwindcss/postcss만 설정. 커스터마이징은 globals.css 내 @theme 블록에서."
+    },
+    {
+      "topic": "DB 테이블 references 예약어",
+      "detail": "SQLite에서 references는 예약어. Raw SQL에서 반드시 큰따옴표로 감싸야 함. Drizzle ORM의 query builder는 자동 처리."
+    },
+    {
+      "topic": "다음 단계 (M9, M10)",
+      "detail": "M9: .claude/agents/design-system.md를 DB 연동으로 업데이트. /api/agent/data 엔드포인트 추가. M10: Dockerfile 작성 (봇+웹앱 단일 컨테이너), Railway/Fly.io 배포."
+    }
+  ],
+  "files_created_total": 24,
+  "files_modified_total": 4,
+  "test_results": {
+    "next_build": "PASS (8 routes, 0 errors)",
+    "tsc_noEmit": "PASS (0 errors)",
+    "db_migration": "PASS (7 tables, 6 indexes)",
+    "ref_migration": "PASS (2 refs migrated)",
+    "dev_server": "PASS (login 200, unauthenticated 307)",
+    "module_import": "PASS (db, capture modules load)"
+  }
+}

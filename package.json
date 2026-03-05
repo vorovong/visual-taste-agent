@@ -4,11 +4,36 @@
   "description": "비디자이너의 시각적 취향 발견 및 체계화 시스템",
   "type": "module",
   "scripts": {
-    "bot": "node bot/index.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "bot": "tsx bot/index.ts",
+    "migrate": "tsx lib/db/migrate.ts",
+    "migrate:refs": "tsx scripts/migrate-refs.ts"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
+    "autoprefixer": "^10.4.27",
+    "better-sqlite3": "^12.6.2",
+    "dotenv": "^16.5.0",
+    "drizzle-orm": "^0.45.1",
     "grammy": "^1.35.0",
+    "next": "^15.5.12",
+    "next-auth": "^5.0.0-beta.30",
+    "postcss": "^8.5.8",
     "puppeteer": "^24.6.0",
-    "dotenv": "^16.5.0"
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.2.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/node": "^25.3.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "drizzle-kit": "^0.31.9",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }

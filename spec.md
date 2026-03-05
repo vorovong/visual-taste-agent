@@ -1,4 +1,4 @@
-# Visual Taste Agent — 기술 명세 (spec.md)
+# Visual Taste Agent v2 -- 기술 명세
 
 ---
 
@@ -6,83 +6,87 @@
 
 ### 1.1 이 시스템이 하는 일
 
-사용자가 좋아하는 시각물(URL, 캡쳐, 파일)을 텔레그램으로 보내면, 시각적 취향을 발견·언어화·체계화하여 모든 시각 매체에서 일관된 디자인을 만들 수 있게 한다.
+사용자가 텔레그램으로 URL을 보내면, 자동 캡쳐 + 디자인 메타데이터 추출 후 DB에 저장. monet.design 스타일 웹앱에서 열람하며 좋아요/싫어요/삭제 + 해시태그로 평가. 축적된 데이터에서 에이전트가 패턴을 추출하고, 최종적으로 "이걸로 작업해줘"가 가능한 디자인 시스템을 생성.
 
 ### 1.2 네 가지 책임 영역
 
-**① AI가 혼자 해야 하는 것** (사람 개입 불필요)
-- URL → Puppeteer 자동 캡쳐 (뷰포트별: 모바일 375px / 태블릿 768px / 데스크탑 1440px)
-- 레퍼런스 메타데이터 생성 (날짜, 출처, 매체 추정)
-- 레퍼런스 간 시각적 유사성 분석
-- profile.md "추정" 영역에 패턴 기록
-- 현재 레벨 자동 판단 (레퍼런스 수, 패턴 안정도 기반)
+**AI가 혼자 해야 하는 것**
+- URL -> Puppeteer 캡쳐 (3종 뷰포트) + 디자인 메타데이터 추출
+- X-Frame-Options 체크 -> iframe_allowed 플래그
+- 레퍼런스 제목 자동 추출 (meta title)
+- 해시태그 usage_count 집계 + 제안 순서 결정
+- 해시태그 카테고리 자동 분류 (충분한 데이터 축적 후)
+- 레벨 자동 판단
 
-**② 사람이 직접 해야 하는 것** (AI가 대신할 수 없음)
-- "좋다/싫다" 이진 판정 (직관은 사용자만 가짐)
-- "추정" → "확실한 것" 승격 확인
-- 토큰 값 최종 결정 (색상, 여백, 서체)
-- 비평 기반 수정을 적용할지 판단
+**사람이 직접 해야 하는 것**
+- 좋다/싫다/삭제 판정
+- 해시태그 선택 (AI가 제안, 사람이 탭)
+- 토큰 값 최종 결정
+- 디자인 시스템 확정
 
-**③ 사람이 씨앗 → AI가 숲**
-- URL 하나 보내면 → AI가 유사 사이트 5개 리서치
-- "이거 좋은데" 한마디 → AI가 왜 좋은지 디자인 언어로 분석
-- 취향 키워드 하나 → AI가 토큰 체계로 확장
+**사람이 씨앗 -> AI가 숲**
+- URL 하나 보내면 -> AI가 캡쳐 + 메타추출 + 유사 리서치
+- 해시태그 몇 개 탭하면 -> AI가 패턴 추출 + 디자인 언어로 분석
+- "이걸로 작업해줘" 한마디 -> AI가 디자인 시스템 기반 전체 설계
 
-**④ AI가 발판 → 사람이 행동**
-- AI가 패턴 제시 → 사용자가 반박/수정 → 수렴
-- AI가 비평 (이 디자인의 문제) → 사용자가 방향 결정
-- AI가 "당신 취향엔 맞지만 타겟에겐..." → 사용자가 조율 판단
-
-### 1.3 데이터 생애주기
-
-```
-[수집] ──→ [분류] ──→ [축적] ──→ [추출] ──→ [체계화] ──→ [비평]
- Lv.0       Lv.0      Lv.0~1     Lv.1       Lv.2~3      Lv.4
-```
-
-| 상태 | 트리거 | 내용 |
-|---|---|---|
-| 수집 | 텔레그램 메시지 수신 | URL/이미지/파일 + 좋다/싫다 판정 |
-| 분류 | 자동 | 매체/용도/청중 태깅, 캡쳐 생성, references/에 저장 |
-| 축적 | 레퍼런스 누적 | references/ 폴더에 메타데이터 포함 파일 쌓임 |
-| 추출 | 레퍼런스 5개+ | 패턴 분석 → patterns/ 생성, profile.md 추정 업데이트 |
-| 체계화 | 패턴 안정화 | 토큰 제안 → 확정 → core.md/contexts/, system/ 생성 |
-| 비평 | 시스템 존재 | 새 디자인 입력 → 취향 일관성 + 청중 적합성 판단 |
+**AI가 발판 -> 사람이 행동**
+- AI가 해시태그 제안 -> 사용자가 선택/거부
+- AI가 패턴 제시 -> 사용자가 반박/수정 -> 수렴
+- AI가 디자인 시스템 초안 -> 사용자가 확정/수정
 
 ---
 
 ## 2. 사용자 흐름
 
-### 흐름 A: 레퍼런스 수집 (일상적, 모바일)
+### 흐름 A: 레퍼런스 수집 (텔레그램, 5초)
+
 ```
-1. 사용자가 폰으로 웹서핑 중 좋은 디자인 발견
-2. 텔레그램 봇에 URL 또는 캡쳐 전송
-3. 봇: "맥락? [웹앱] [PPT] [문서] [기타]" (인라인 키보드)
-4. 사용자: [웹앱] 탭
-5. 봇: "판정? [👍 좋다] [👎 싫다]"
-6. 사용자: 👍
-7. 봇: Puppeteer 캡쳐 실행, references/에 저장
-8. 봇: "저장됨 ✓ (현재 레퍼런스 12개, Lv.1)"
+1. 사용자가 텔레그램 봇에 URL 전송
+2. 봇: Puppeteer 캡쳐 + 메타추출 + DB 저장 (pending)
+3. 봇: "저장됨. (현재 47개, 미평가 4개)"
 ```
 
-### 흐름 B: 패턴 리뷰 (터미널, 심층)
+### 흐름 B: 평가 (웹앱, 배치)
+
+```
+1. 웹앱 접속 -> 대시보드에 "미평가 4개" 표시
+2. [지금 평가하기] 클릭 -> 미평가 레퍼런스만 필터
+3. 각 카드에서:
+   - 좋아요/싫어요/삭제 탭
+   - 해시태그 선택 (기존 풀에서 탭, 또는 새로 입력)
+4. 완료. 타이핑 0 (해시태그 풀 성숙 후)
+```
+
+### 흐름 C: 상세 리뷰 (웹앱)
+
+```
+1. 카드 클릭 -> 상세 페이지
+2. Desktop/Tablet/Mobile 뷰포트 전환 (iframe 또는 스크린샷)
+3. 사이드바: 컬러팔레트, 폰트, 레이아웃 구조 확인
+4. 해시태그 추가/수정, verdict 변경 가능
+5. AI Analysis 확인 (에이전트 세션 이후 표시)
+```
+
+### 흐름 D: 패턴 리뷰 (에이전트 세션)
+
 ```
 1. claude --agent design-system
-2. 에이전트: "Lv.1입니다. 12개 레퍼런스에서 3가지 패턴 발견:
-   - 넓은 여백 선호 (10/12)
-   - 뉴트럴 톤 (9/12)
-   - 산세리프 서체 (11/12)
-   반박하실 것 있나요?"
-3. 사용자: "뉴트럴 톤은... PPT에서는 좀 다를 수 있어"
-4. 에이전트: profile.md 업데이트 — 뉴트럴 톤을 맥락별로 분리
+2. 에이전트가 DB에서 평가 데이터 로드
+3. "20개 레퍼런스에서 3가지 패턴 발견:
+    - #여백좋음 태그 15/20 -> 넓은 여백 선호
+    - #미니멀 + #쇼핑몰 조합 빈번 -> 쇼핑몰에서 미니멀 선호
+    반박하실 것 있나요?"
+4. 반박 -> profile.md 갱신 -> 수렴
 ```
 
-### 흐름 C: 비평 (Lv.4 도달 후)
+### 흐름 E: 디자인 시스템 활용 (Lv.5)
+
 ```
-1. 사용자: [프론트엔드 스크린샷 보냄]
-2. 에이전트: "당신 취향에는 맞는데, 타겟(40대 비개발자)에게는
-   정보 밀도가 너무 낮을 수 있어요.
-   취향 유지하면서 밀도 올리는 방법: ..."
+1. 사용자: "쇼핑몰 프로젝트 시작할건데, DS-A로 작업해줘"
+   또는: "DS-A 기반인데, 좀 더 따뜻한 색감으로"
+2. 에이전트가 design_systems 테이블에서 DS-A 로드
+3. 토큰 + 아토믹 스펙 기반으로 자율 설계
+4. 비평: "취향엔 맞는데, 40대 타겟에겐 폰트 살짝 키우는게..."
 ```
 
 ---
@@ -90,115 +94,132 @@
 ## 3. 입력 명세
 
 ### 3.1 텔레그램 메시지
+
 ```yaml
 텔레그램_메시지:
-  format: URL | 이미지(jpg/png/webp) | 파일(PDF/PPT/피그마 캡쳐)
-  source: 텔레그램 봇 API (long polling 또는 webhook)
+  format: URL | 이미지(jpg/png/webp) | 파일
+  source: 텔레그램 봇 API (long polling)
   constraints:
-    - 이미지 최대 20MB (텔레그램 제한)
-    - URL은 공개 접근 가능해야 함 (로그인 필요 사이트 제외)
-    - 봇 사용자는 1인 (김민호) — 멀티유저 불필요
+    - 이미지 최대 20MB
+    - URL은 공개 접근 가능해야 함
+    - chat_id 화이트리스트로 제한
 ```
 
-### 3.2 터미널 입력 (에이전트)
+### 3.2 웹앱 입력
+
+```yaml
+웹앱_입력:
+  format: verdict(like/dislike/delete) | 해시태그 선택/입력
+  source: Next.js API routes
+  constraints:
+    - Google OAuth 인증 필수
+    - 이메일 화이트리스트로 제한
+```
+
+### 3.3 에이전트 입력
+
 ```yaml
 에이전트_입력:
-  format: 자연어 텍스트 | 파일 경로 | URL
+  format: 자연어 | DB 쿼리 결과
   source: claude --agent design-system
   constraints:
-    - 로컬 파일 접근 가능
-    - 이미지 분석 가능 (Claude 멀티모달)
+    - DB 직접 쿼리 또는 /api/agent/data 엔드포인트
 ```
 
 ---
 
 ## 4. 출력 명세
 
-### 4.1 레퍼런스 파일
-```yaml
-레퍼런스:
-  format: markdown (YAML 프론트매터 + 분석 본문)
-  destination: design-system/references/{id}.md
-```
+### 4.1 DB 레코드
 
-예시:
-```markdown
----
-id: ref-001
-url: https://example.com
-captured: 2026-03-05
-verdict: like
-context:
-  medium: 웹앱
-  purpose: 대시보드
-  audience: 내부팀
+```yaml
+references:
+  format: SQLite 레코드
+  fields: id, url, title, verdict, source_type, iframe_allowed, captured_at, evaluated_at
+
 screenshots:
-  - mobile.png
-  - tablet.png
-  - desktop.png
----
+  format: PNG 파일 + DB 레코드
+  storage: public/screenshots/{ref_id}/{viewport}.png
 
-## AI 분석
-- 색상: 뉴트럴 그레이 계열, 포인트 블루
-- 여백: 넓은 카드 간 간격 (24px+)
-- 서체: 산세리프, 본문 14~16px
-- 레이아웃: 2컬럼 그리드, 좌측 사이드바
-- 정보 밀도: 중간
+design_metadata:
+  format: JSON (DB에 저장)
+  fields:
+    colors: { background, text, primary, secondary, accent }
+    fonts: [{ family, size, weight }]
+    layout: { type, columns, gap, padding }
+    meta: { framework, libraries }
 ```
 
-### 4.2 프로필
+### 4.2 해시태그
+
 ```yaml
-프로필:
-  format: markdown (구조화된 취향 기록)
-  destination: design-system/profile.md
+hashtags:
+  format: DB 레코드
+  fields: id, name, category(nullable), usage_count
+  behavior:
+    - 새 태그: category = null, usage_count = 1
+    - 기존 태그 사용 시: usage_count++
+    - 에이전트가 축적 후 category 자동 분류 (why/purpose/style/layout/typography)
 ```
 
-### 4.3 토큰
-```yaml
-토큰:
-  format: markdown + CSS 변수 (코드 블록)
-  destination: design-system/tokens/core.md, design-system/tokens/contexts/
-```
+### 4.3 디자인 시스템 (Lv.5)
 
-### 4.4 비평 피드백
 ```yaml
-비평:
-  format: 자연어 텍스트 (터미널 또는 텔레그램)
-  destination: 사용자에게 직접 전달
+design_systems:
+  format: DB 레코드 + 마크다운 파일
+  fields:
+    name: "Clean Dashboard v1"
+    philosophy: 디자인 철학 요약 (마크다운)
+    tokens: JSON (색상, 타이포, 스페이싱 등)
+    atomic_spec: 아토믹 디자인 스펙 (마크다운)
+    based_on: 근거 reference IDs (JSON)
+    status: draft | stable | archived
+  destination: design-system/systems/{name}.md (에이전트가 생성)
 ```
 
 ---
 
 ## 5. 성공 기준
 
-### 필수 (MVP)
-- [ ] 텔레그램봇으로 URL 전송 → 자동 캡쳐 → references/에 저장
-- [ ] 좋다/싫다 판정 + 맥락 태깅 (인라인 키보드)
-- [ ] profile.md 빈 상태 초기화, 수동 업데이트 가능
-- [ ] 에이전트 정의 파일 동작 (claude --agent design-system)
-- [ ] 레퍼런스 5개 이상 시 기본 패턴 추출
+### MVP (Phase 1-2)
+- [ ] 텔레그램으로 URL 전송 -> 자동 캡쳐 + 메타추출 -> DB 저장 (pending)
+- [ ] 웹앱에서 레퍼런스 갤러리 열람 (monet.design 스타일)
+- [ ] 상세 페이지에서 멀티뷰포트 프리뷰 + 디자인 메타데이터 표시
+- [ ] Google OAuth 인증 (단일 사용자)
 
-### 품질
-- [ ] Puppeteer 뷰포트별(3종) 자동 캡쳐
-- [ ] 자동 레벨 판단 (Lv.0~4)
-- [ ] 패턴 추출 → 사용자 반박 루프 동작
-- [ ] 토큰 제안 → 확정 워크플로우
-- [ ] 맥락별(매체/용도/청중) 취향 분리
+### Core (Phase 3)
+- [ ] 좋아요/싫어요/삭제 평가
+- [ ] 해시태그 선택 + 새 태그 추가
+- [ ] 미평가 레퍼런스 필터링
+- [ ] 대시보드 (통계, 미평가, 최근)
+- [ ] 동적 그룹 탭
 
-### 비전 (이 프로젝트 범위 밖)
-- [ ] Computer Use로 Puppeteer 대체 (에이전트 직접 브라우저 조작)
-- [ ] 미세한 디자인 뉘앙스 자동 읽기
-- [ ] 토큰 → 프로덕션 React/CSS 컴포넌트 자동 생성
-- [ ] 사용자 취향 예측 (입력 전 추천)
+### Integration (Phase 4)
+- [ ] 에이전트가 DB 데이터 기반 패턴 추출
+- [ ] profile.md 자동 생성
+
+### Production (Phase 5)
+- [ ] 보안 (OAuth + 화이트리스트 + CSP + HTTPS)
+- [ ] 배포 (Railway/Fly.io)
+- [ ] 봇 + 웹앱 안정 운영
+
+### Vision (범위 밖, 미래)
+- [ ] Lv.5 디자인 시스템 프리셋 생성 + "이걸로 작업해줘" 실행
+- [ ] 트렌드 추적 자동화
+- [ ] 지식 저장소 등 다른 모듈과 통합 허브
+- [ ] Computer Use로 Puppeteer 대체
 
 ---
 
 ## 6. 엣지 케이스
 
-| 상황 | 대응 | 상태 |
-|---|---|---|
-| URL이 로그인 필요 사이트 | Puppeteer 캡쳐 실패 → "이 URL은 캡쳐 불가. 스크린샷을 보내주세요" | 설계 |
-| 동일 URL 중복 전송 | 기존 레퍼런스에 추가 분석 병합, 중복 생성 방지 | 설계 |
-| 레퍼런스가 극단적으로 다양 (패턴 추출 불가) | "아직 일관된 패턴이 보이지 않습니다. 더 모아볼까요?" | 설계 |
-| 봇 서버 다운 | 텔레그램 메시지 유실 없음 (텔레그램이 재전송). 서버 재시작 시 처리 | 설계 |
-| 이미지만 보냄 (URL 없음) | 이미지 자체를 레퍼런스로 저장, AI 분석은 이미지 기반 | 설계 |
+| 상황 | 대응 |
+|---|---|
+| URL이 로그인 필요 | 캡쳐 실패 -> "캡쳐 불가. 스크린샷을 보내주세요" |
+| 동일 URL 중복 전송 | 기존 레퍼런스 존재 알림, 중복 생성 방지 |
+| iframe 차단 사이트 | iframe_allowed = false, 스크린샷 폴백 자동 |
+| 메타데이터 추출 실패 | 스크린샷만 저장, design_metadata = null |
+| 봇 서버 다운 | 텔레그램 재전송 (서버 재시작 시 처리) |
+| 이미지만 전송 (URL 없음) | 이미지 자체를 레퍼런스로 저장, iframe 불가 |
+| 해시태그 오타/중복 | 자동완성으로 방지, 에이전트가 나중에 병합 제안 |
+| DB 파일 손상 | SQLite WAL 모드 + Git으로 백업 가능 |
