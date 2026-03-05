@@ -1,8 +1,17 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
+
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  weight: ["400", "500"],
+});
 
 export const metadata: Metadata = {
   title: "Visual Taste Agent",
@@ -16,7 +25,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={`${inter.className} bg-neutral-950 text-neutral-100 antialiased`}>
+      <body
+        className={`${inter.variable} ${mono.variable} ${inter.className} bg-neutral-950 text-neutral-100 antialiased`}
+      >
         {children}
       </body>
     </html>
