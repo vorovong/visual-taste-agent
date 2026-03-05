@@ -89,3 +89,15 @@ html {
   background: rgba(16, 185, 129, 0.3);
   color: white;
 }
+
+/* Mobile bottom nav safe area */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Mobile: add bottom padding for fixed nav */
+@media (max-width: 639px) {
+  main {
+    padding-bottom: 4.5rem;
+  }
+}
