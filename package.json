@@ -1,0 +1,14 @@
+{
+  "name": "visual-taste-agent",
+  "version": "0.1.0",
+  "description": "비디자이너의 시각적 취향 발견 및 체계화 시스템",
+  "type": "module",
+  "scripts": {
+    "bot": "node bot/index.js"
+  },
+  "dependencies": {
+    "grammy": "^1.35.0",
+    "puppeteer": "^24.6.0",
+    "dotenv": "^16.5.0"
+  }
+}

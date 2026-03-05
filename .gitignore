@@ -3,3 +3,4 @@ node_modules/
 design-system/references/*/screenshots/
 *.log
 .DS_Store
+package-lock.json

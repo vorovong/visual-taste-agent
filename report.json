@@ -1,0 +1,198 @@
+{
+  "meta": {
+    "project": "visual-taste-agent",
+    "description": "비디자이너의 시각적 취향 발견 및 체계화 시스템",
+    "started": "2026-03-05",
+    "completed": "2026-03-05",
+    "sessions": 2,
+    "total_files_created": 11,
+    "test_result": "21/21 passed"
+  },
+
+  "architecture": {
+    "pattern": "수집기(봇) + 분석기(에이전트) 분리",
+    "rationale": "봇은 멍청한 수집기로 유지 → API 키 불필요, 안정적. 지능은 에이전트 세션에 집중",
+    "components": [
+      {
+        "name": "telegram-bot",
+        "tech": "grammy + Node.js",
+        "role": "모바일 수집 채널 (URL/이미지/파일 → 메타데이터 → 로컬 저장)",
+        "runs": "npm run bot (long polling, 로컬)"
+      },
+      {
+        "name": "puppeteer-capture",
+        "tech": "puppeteer",
+        "role": "URL → 3종 뷰포트(375/768/1440) 스크린샷",
+        "runs": "봇에서 자동 호출"
+      },
+      {
+        "name": "design-system-agent",
+        "tech": "Claude Code custom agent (.claude/agents/)",
+        "role": "레퍼런스 분석, 패턴 추출, 토큰화, 비평",
+        "runs": "claude --agent design-system (Max Plan)"
+      },
+      {
+        "name": "data-store",
+        "tech": "로컬 마크다운 + Git",
+        "role": "profile.md(에이전트 뇌) + references/ + patterns/ + tokens/ + system/"
+      }
+    ]
+  },
+
+  "decisions": [
+    {
+      "what": "grammy 선택 (node-telegram-bot-api 대신)",
+      "why": "인라인 키보드 API가 깔끔, ESM 네이티브 지원, 활발한 유지보수",
+      "alternatives_considered": ["node-telegram-bot-api"],
+      "confidence": "high"
+    },
+    {
+      "what": "Anthropic API 키 불필요",
+      "why": "Claude Code Max Plan으로 에이전트 실행. 봇은 AI 호출 없이 수집만 담당",
+      "trigger": "사용자 피드백 — '클로드 맥스플랜으로 실행할건데?'",
+      "lesson": "기존 구독/플랜을 먼저 확인하라. 별도 API 키가 정말 필요한지 질문하라"
+    },
+    {
+      "what": "레퍼런스를 서브디렉토리 구조로 저장",
+      "why": "ref-001/ref-001.md + screenshots/ 형태 → 스크린샷과 메타데이터를 함께 관리",
+      "tradeoff": "디렉토리 탐색 로직이 단순 파일 목록보다 복잡해짐"
+    },
+    {
+      "what": "long polling (webhook 대신)",
+      "why": "서버/도메인/배포 불필요. 로컬 맥에서 실행. 꺼지면 멈추지만 텔레그램이 메시지 보관",
+      "when_to_reconsider": "24시간 상시 운영이 필요해질 때 → VPS + webhook"
+    },
+    {
+      "what": "봇은 멍청한 수집기로 유지",
+      "why": "복잡한 AI 로직을 봇에 넣으면 API 키 필요 + 에러 표면 증가. 분석은 에이전트 세션에서",
+      "lesson": "컴포넌트 책임을 명확히 분리하면 의존성이 줄어든다"
+    }
+  ],
+
+  "failures": [
+    {
+      "id": "F001",
+      "phase": "M2 (E2E 테스트)",
+      "symptom": "checkDuplicateUrl이 이미 저장된 URL을 찾지 못함 (null 반환)",
+      "root_cause": "레퍼런스를 references/ref-001/ref-001.md (서브디렉토리)에 저장하는데, 함수는 references/ref-001.md (직접 파일)를 탐색",
+      "fix": "getRefDirs() 공통 함수 추출 → 서브디렉토리 기반으로 탐색하도록 변경",
+      "time_to_fix": "2분",
+      "category": "data-model-mismatch",
+      "lesson": "저장 구조를 변경하면 읽기 함수도 반드시 함께 검증하라. 쓰기와 읽기를 같은 테스트에서 검증하면 즉시 잡힌다",
+      "prevention": "저장/조회 함수를 작성할 때 반드시 왕복(round-trip) 테스트를 먼저 작성"
+    },
+    {
+      "id": "F002",
+      "phase": "M2 (E2E 테스트)",
+      "symptom": "getRefCount가 0을 반환 (실제로는 1개 존재)",
+      "root_cause": "F001과 동일 — readdir로 ref-*.md 파일을 찾는데 서브디렉토리만 존재",
+      "fix": "F001과 함께 수정됨",
+      "category": "data-model-mismatch",
+      "lesson": "같은 근본 원인의 버그는 묶어서 수정하라"
+    }
+  ],
+
+  "flow": {
+    "implementation_order": ["M1:프로젝트초기화", "M2:텔레그램봇", "M3:Puppeteer캡쳐", "M4:에이전트정의"],
+    "steps": [
+      {
+        "step": 1,
+        "milestone": "M1",
+        "actions": ["package.json 생성", "npm install (grammy, puppeteer, dotenv)", "design-system/ 폴더구조", "profile.md 초기화"],
+        "blockers": [],
+        "duration_note": "빠름"
+      },
+      {
+        "step": 2,
+        "milestone": "M2+M3",
+        "actions": [
+          "bot/lib/reference.js — 레퍼런스 CRUD",
+          "scripts/capture.js — Puppeteer 3종 뷰포트 캡쳐",
+          "bot/handlers/collect.js — 인라인 키보드 흐름 (매체→용도→판정→저장+캡쳐)",
+          "bot/index.js — 엔트리포인트 (/start, /status, 수집 핸들러)"
+        ],
+        "blockers": ["텔레그램 봇 토큰 (사용자 발급)"],
+        "duration_note": "핵심 구현"
+      },
+      {
+        "step": 3,
+        "milestone": "M4",
+        "actions": [".claude/agents/design-system.md — 에이전트 정의 (레벨별 행동, 분석 항목, 프로필 규칙)"],
+        "blockers": [],
+        "duration_note": "빠름"
+      },
+      {
+        "step": 4,
+        "milestone": "테스트",
+        "actions": [
+          "봇 토큰 연결 테스트 (getMe API)",
+          "Puppeteer 캡쳐 단독 테스트 (example.com)",
+          "E2E 시뮬레이션 — 21개 어설션 (ID생성, 저장, 중복체크, 카운트, 캡쳐, 메타데이터, 실패케이스, 이미지, 프로필)"
+        ],
+        "blockers": [],
+        "bugs_found": ["F001", "F002"],
+        "duration_note": "버그 발견 및 수정 포함"
+      }
+    ]
+  },
+
+  "reusable_patterns": [
+    {
+      "name": "텔레그램봇 인라인 키보드 멀티스텝",
+      "description": "세션 Map으로 사용자별 상태 관리 → callback_query:data로 단계별 진행",
+      "files": ["bot/handlers/collect.js"],
+      "applicable_to": "텔레그램봇에서 여러 단계의 사용자 입력이 필요한 경우"
+    },
+    {
+      "name": "Puppeteer 멀티 뷰포트 캡쳐",
+      "description": "뷰포트 배열 순회 → 각각 setViewport + screenshot",
+      "files": ["scripts/capture.js"],
+      "applicable_to": "웹페이지 반응형 스크린샷이 필요한 경우"
+    },
+    {
+      "name": "마크다운 YAML 프론트매터 데이터 저장",
+      "description": "YAML 프론트매터 + 마크다운 본문으로 구조화된 데이터를 파일로 저장. Git 버전 관리 가능",
+      "files": ["bot/lib/reference.js"],
+      "applicable_to": "DB 없이 로컬에서 구조화된 데이터를 관리해야 할 때"
+    },
+    {
+      "name": "Claude Code custom agent로 분석 위임",
+      "description": "수집은 외부 프로세스(봇), 분석은 에이전트 세션. API 키 불필요 (Max Plan 활용)",
+      "files": [".claude/agents/design-system.md"],
+      "applicable_to": "AI 분석이 필요하지만 실시간이 아닌 경우. 별도 API 비용을 피하고 싶을 때"
+    },
+    {
+      "name": "E2E 시뮬레이션 테스트",
+      "description": "외부 서비스(텔레그램) 없이 데이터 흐름 전체를 검증. 저장→조회→수정→삭제 왕복 테스트",
+      "files": ["test/e2e-simulate.js"],
+      "applicable_to": "외부 의존성이 있는 시스템의 로컬 테스트"
+    }
+  ],
+
+  "user_actions_required": {
+    "before_start": [
+      "텔레그램 @BotFather에서 봇 생성 → 토큰을 .env에 저장"
+    ],
+    "daily_use": [
+      "npm run bot — 봇 실행 (맥이 켜져 있을 때)",
+      "텔레그램에서 URL/이미지 보내기 → 매체 → 용도 → 판정",
+      "레퍼런스 5개+ 모이면: claude --agent design-system"
+    ],
+    "none_needed_for": ["Anthropic API 키", "서버 배포", "도메인"]
+  },
+
+  "next_milestones": [
+    {
+      "id": "M5",
+      "name": "자동 레벨업 + 패턴 추출",
+      "trigger": "레퍼런스 5개 이상 수집 후",
+      "description": "에이전트가 레퍼런스를 분석하고 패턴을 추출, 사용자 반박 루프"
+    },
+    {
+      "id": "M6",
+      "name": "토큰화 + 비평 모드",
+      "trigger": "패턴 안정화 후",
+      "description": "취향 → 디자인 토큰 → 시스템 문서 → 비평"
+    }
+  ]
+}
