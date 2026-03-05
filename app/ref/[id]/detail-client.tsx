@@ -248,7 +248,7 @@ export function DetailClient({
                   <button
                     key={btn.value}
                     onClick={() => handleVerdict(btn.value)}
-                    className={`flex flex-col items-center gap-1.5 rounded-xl py-3 text-xs font-semibold transition-all ${
+                    className={`flex flex-col items-center gap-1.5 rounded-xl py-3 sm:py-3 min-h-[48px] text-xs font-semibold transition-all ${
                       verdict === btn.value
                         ? btn.activeClass
                         : "bg-white/[0.03] border border-white/[0.06] text-neutral-500 hover:bg-white/[0.06] hover:text-neutral-300"

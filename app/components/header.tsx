@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 interface HeaderProps {
   pendingCount: number;
@@ -9,10 +9,60 @@ interface HeaderProps {
 
 export function Header({ pendingCount }: HeaderProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentVerdict = searchParams.get("verdict") || "";
+
+  const bottomTabs = [
+    {
+      href: "/",
+      verdict: "",
+      label: "전체",
+      activeColor: "text-emerald-400",
+      icon: (
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+        </svg>
+      ),
+    },
+    {
+      href: "/?verdict=like",
+      verdict: "like",
+      label: "좋아요",
+      activeColor: "text-emerald-400",
+      icon: (
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+        </svg>
+      ),
+    },
+    {
+      href: "/?verdict=pending",
+      verdict: "pending",
+      label: "대기",
+      activeColor: "text-amber-400",
+      badge: pendingCount > 0 ? pendingCount : null,
+      icon: (
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      ),
+    },
+    {
+      href: "/?verdict=dislike",
+      verdict: "dislike",
+      label: "패스",
+      activeColor: "text-red-400",
+      icon: (
+        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715a12.137 12.137 0 01-.068-1.285c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384" />
+        </svg>
+      ),
+    },
+  ];
 
   return (
     <>
-      {/* Desktop / Top header */}
+      {/* Top header */}
       <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-neutral-950/70 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
@@ -63,7 +113,7 @@ export function Header({ pendingCount }: HeaderProps) {
             </Link>
           </nav>
 
-          {/* Mobile: pending badge only in header */}
+          {/* Mobile: pending badge in header */}
           {pendingCount > 0 && (
             <Link
               href="/?verdict=pending"
@@ -82,63 +132,27 @@ export function Header({ pendingCount }: HeaderProps) {
       {/* Mobile bottom navigation */}
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.06] bg-neutral-950/90 backdrop-blur-xl safe-area-bottom">
         <div className="flex items-stretch">
-          <Link
-            href="/"
-            className={`flex flex-1 flex-col items-center gap-1 py-2.5 transition-colors ${
-              pathname === "/" && !new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('verdict')
-                ? "text-emerald-400"
-                : "text-neutral-600"
-            }`}
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-            </svg>
-            <span className="text-[10px] font-medium">전체</span>
-          </Link>
-          <Link
-            href="/?verdict=like"
-            className={`flex flex-1 flex-col items-center gap-1 py-2.5 transition-colors ${
-              new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('verdict') === 'like'
-                ? "text-emerald-400"
-                : "text-neutral-600"
-            }`}
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-            </svg>
-            <span className="text-[10px] font-medium">좋아요</span>
-          </Link>
-          <Link
-            href="/?verdict=pending"
-            className={`relative flex flex-1 flex-col items-center gap-1 py-2.5 transition-colors ${
-              new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('verdict') === 'pending'
-                ? "text-amber-400"
-                : "text-neutral-600"
-            }`}
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="text-[10px] font-medium">대기</span>
-            {pendingCount > 0 && (
-              <span className="absolute top-1 right-1/4 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-bold text-black">
-                {pendingCount}
-              </span>
-            )}
-          </Link>
-          <Link
-            href="/?verdict=dislike"
-            className={`flex flex-1 flex-col items-center gap-1 py-2.5 transition-colors ${
-              new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('verdict') === 'dislike'
-                ? "text-red-400"
-                : "text-neutral-600"
-            }`}
-          >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M7.498 15.25H4.372c-1.026 0-1.945-.694-2.054-1.715a12.137 12.137 0 01-.068-1.285c0-2.848.992-5.464 2.649-7.521C5.287 4.247 5.886 4 6.504 4h4.016a4.5 4.5 0 011.423.23l3.114 1.04a4.5 4.5 0 001.423.23h1.294M7.498 15.25c.618 0 .991.724.725 1.282A7.471 7.471 0 007.5 19.75 2.25 2.25 0 009.75 22a.75.75 0 00.75-.75v-.633c0-.573.11-1.14.322-1.672.304-.76.93-1.33 1.653-1.715a9.04 9.04 0 002.86-2.4c.498-.634 1.226-1.08 2.032-1.08h.384" />
-            </svg>
-            <span className="text-[10px] font-medium">패스</span>
-          </Link>
+          {bottomTabs.map((tab) => {
+            const isActive =
+              pathname === "/" && currentVerdict === tab.verdict;
+            return (
+              <Link
+                key={tab.verdict || "all"}
+                href={tab.href}
+                className={`relative flex flex-1 flex-col items-center gap-1 py-2.5 min-h-[48px] justify-center transition-colors ${
+                  isActive ? tab.activeColor : "text-neutral-600"
+                }`}
+              >
+                {tab.icon}
+                <span className="text-[10px] font-medium">{tab.label}</span>
+                {tab.badge && (
+                  <span className="absolute top-1 right-1/4 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-bold text-black">
+                    {tab.badge}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </div>
       </nav>
     </>
