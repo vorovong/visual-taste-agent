@@ -6,7 +6,7 @@ test.describe("전체 페이지 E2E 점검", () => {
   test("로그인 페이지", async ({ page }) => {
     await page.goto(`${BASE}/login`);
     await expect(page.locator("h1")).toContainText("Visual Taste Agent");
-    await expect(page.locator("button")).toContainText("Google로 로그인");
+    await expect(page.locator("button[type='submit']")).toContainText("Google로 계속하기");
     const errors = await page.evaluate(() =>
       (window as any).__NEXT_DATA__?.err || null
     );
