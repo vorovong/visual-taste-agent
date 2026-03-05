@@ -43,6 +43,40 @@ function SkeletonCard() {
   );
 }
 
+function ScrollToTop() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 400);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  if (!visible) return null;
+
+  return (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className="fixed bottom-6 right-6 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-white/[0.08] bg-neutral-900/90 text-neutral-400 shadow-xl shadow-black/30 backdrop-blur-sm transition-all hover:bg-neutral-800 hover:text-white hover:border-white/[0.15] hover:-translate-y-0.5"
+      aria-label="맨 위로"
+    >
+      <svg
+        className="h-4 w-4"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18"
+        />
+      </svg>
+    </button>
+  );
+}
+
 export function GalleryClient({ stats: initialStats }: { stats: Stats }) {
   const searchParams = useSearchParams();
   const verdict = searchParams.get("verdict") || "";
@@ -93,8 +127,16 @@ export function GalleryClient({ stats: initialStats }: { stats: Stats }) {
           currentSearch={search}
           currentSort={sort}
         />
+
+        {/* Results count */}
+        {!loading && refs.length > 0 && (
+          <div className="text-[11px] text-neutral-600 tabular-nums">
+            {refs.length}개의 레퍼런스
+          </div>
+        )}
+
         {loading ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <SkeletonCard key={i} />
             ))}
@@ -122,18 +164,20 @@ export function GalleryClient({ stats: initialStats }: { stats: Stats }) {
                   레퍼런스가 없습니다
                 </p>
                 <p className="mt-1 text-xs text-neutral-500 leading-relaxed">
-                  텔레그램 봇에서 URL을 보내면<br />여기에 자동으로 수집됩니다
+                  텔레그램 봇에서 URL을 보내면
+                  <br />
+                  여기에 자동으로 수집됩니다
                 </p>
               </div>
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {refs.map((ref, i) => (
               <div
                 key={ref.id}
                 className="card-enter"
-                style={{ animationDelay: `${i * 50}ms` }}
+                style={{ animationDelay: `${Math.min(i, 12) * 50}ms` }}
               >
                 <ReferenceCard
                   id={ref.id}
@@ -149,6 +193,8 @@ export function GalleryClient({ stats: initialStats }: { stats: Stats }) {
           </div>
         )}
       </main>
+
+      <ScrollToTop />
     </div>
   );
 }
