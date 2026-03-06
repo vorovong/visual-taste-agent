@@ -9,7 +9,8 @@
     "start": "next start",
     "bot": "tsx bot/index.ts",
     "migrate": "tsx lib/db/migrate.ts",
-    "migrate:refs": "tsx scripts/migrate-refs.ts"
+    "migrate:refs": "tsx scripts/migrate-refs.ts",
+    "profile": "tsx scripts/generate-profile.ts"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.2.1",
