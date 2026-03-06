@@ -19,7 +19,7 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
       href: "/",
       key: "all",
       label: "전체",
-      activeColor: "text-emerald-400",
+      activeColor: "text-emerald-600 dark:text-emerald-400",
       isActive: pathname === "/" && !currentVerdict,
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -31,7 +31,7 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
       href: "/evaluate",
       key: "evaluate",
       label: "평가",
-      activeColor: "text-amber-400",
+      activeColor: "text-amber-600 dark:text-amber-400",
       isActive: pathname === "/evaluate",
       badge: pendingCount > 0 ? pendingCount : null,
       icon: (
@@ -44,7 +44,7 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
       href: "/?verdict=like",
       key: "like",
       label: "좋아요",
-      activeColor: "text-emerald-400",
+      activeColor: "text-emerald-600 dark:text-emerald-400",
       isActive: pathname === "/" && currentVerdict === "like",
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -56,7 +56,7 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
       href: "/?verdict=dislike",
       key: "dislike",
       label: "패스",
-      activeColor: "text-red-400",
+      activeColor: "text-red-600 dark:text-red-400",
       isActive: pathname === "/" && currentVerdict === "dislike",
       icon: (
         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -69,7 +69,7 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
   return (
     <>
       {/* Top header */}
-      <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-neutral-950/70 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 border-b border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-950/70 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
@@ -88,7 +88,7 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
                 <circle cx="12" cy="12" r="3" />
               </svg>
             </div>
-            <span className="text-sm font-semibold tracking-tight text-neutral-200 transition-colors group-hover:text-white">
+            <span className="text-sm font-semibold tracking-tight text-neutral-800 dark:text-neutral-200 transition-colors group-hover:text-neutral-900 dark:group-hover:text-white">
               VTA
             </span>
           </Link>
@@ -98,11 +98,11 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
             {pendingCount > 0 && (
               <Link
                 href="/evaluate"
-                className="mr-2 flex items-center gap-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 px-3 py-1 text-xs font-medium text-amber-400 transition-all hover:bg-amber-500/20 hover:border-amber-500/30"
+                className="mr-2 flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/20 px-3 py-1 text-xs font-medium text-amber-700 dark:text-amber-400 transition-all hover:bg-amber-200 dark:hover:bg-amber-500/20 hover:border-amber-400 dark:hover:border-amber-500/30"
               >
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-400" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500 dark:bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
                 </span>
                 {pendingCount} 미평가
               </Link>
@@ -111,8 +111,8 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
               href="/"
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                 pathname === "/"
-                  ? "bg-white/[0.08] text-white"
-                  : "text-neutral-500 hover:text-neutral-200 hover:bg-white/[0.04]"
+                  ? "bg-neutral-100 dark:bg-white/[0.08] text-neutral-900 dark:text-white"
+                  : "text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/[0.04]"
               }`}
             >
               갤러리
@@ -121,8 +121,8 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
               href="/evaluate"
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                 pathname === "/evaluate"
-                  ? "bg-white/[0.08] text-white"
-                  : "text-neutral-500 hover:text-neutral-200 hover:bg-white/[0.04]"
+                  ? "bg-neutral-100 dark:bg-white/[0.08] text-neutral-900 dark:text-white"
+                  : "text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/[0.04]"
               }`}
             >
               평가
@@ -130,7 +130,7 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
             {onUploadClick && (
               <button
                 onClick={onUploadClick}
-                className="ml-1 flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-white/[0.08] hover:text-neutral-200"
+                className="ml-1 flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-100 dark:hover:bg-white/[0.08] hover:text-neutral-800 dark:hover:text-neutral-200"
                 aria-label="파일 업로드"
               >
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -146,11 +146,11 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
             {pendingCount > 0 && (
               <Link
                 href="/evaluate"
-                className="flex items-center gap-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 px-3 py-1 text-xs font-medium text-amber-400"
+                className="flex items-center gap-1.5 rounded-full bg-amber-100 dark:bg-amber-500/10 border border-amber-300 dark:border-amber-500/20 px-3 py-1 text-xs font-medium text-amber-700 dark:text-amber-400"
               >
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-75" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-400" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-500 dark:bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
                 </span>
                 {pendingCount}
               </Link>
@@ -161,7 +161,7 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
       </header>
 
       {/* Mobile bottom navigation */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-white/[0.06] bg-neutral-950/90 backdrop-blur-xl safe-area-bottom">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-950/90 backdrop-blur-xl safe-area-bottom">
         <div className="flex items-stretch">
           {bottomTabs.map((tab) => {
             return (
@@ -169,13 +169,13 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
                 key={tab.key}
                 href={tab.href}
                 className={`relative flex flex-1 flex-col items-center gap-1 py-2.5 min-h-[48px] justify-center transition-colors ${
-                  tab.isActive ? tab.activeColor : "text-neutral-600"
+                  tab.isActive ? tab.activeColor : "text-neutral-400 dark:text-neutral-600"
                 }`}
               >
                 {tab.icon}
                 <span className="text-[10px] font-medium">{tab.label}</span>
                 {tab.badge && (
-                  <span className="absolute top-1 right-1/4 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-bold text-black">
+                  <span className="absolute top-1 right-1/4 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-bold text-white dark:text-black">
                     {tab.badge}
                   </span>
                 )}

@@ -93,17 +93,17 @@ export function SearchModal() {
       onClick={() => setOpen(false)}
     >
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="fixed inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm" />
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-lg rounded-2xl border border-white/[0.08] bg-neutral-900 shadow-2xl shadow-black/50 overflow-hidden"
+        className="relative w-full max-w-lg rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 shadow-2xl shadow-black/20 dark:shadow-black/50 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Input */}
-        <div className="flex items-center border-b border-white/[0.06] px-4">
+        <div className="flex items-center border-b border-neutral-200 dark:border-neutral-800 px-4">
           <svg
-            className="h-4 w-4 text-neutral-500 shrink-0"
+            className="h-4 w-4 text-neutral-400 dark:text-neutral-500 shrink-0"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -122,9 +122,9 @@ export function SearchModal() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="제목, URL, 태그, 도메인 검색..."
-            className="flex-1 bg-transparent px-3 py-4 text-sm text-neutral-200 placeholder-neutral-600 outline-none"
+            className="flex-1 bg-transparent px-3 py-4 text-sm text-neutral-800 dark:text-neutral-200 placeholder-neutral-400 dark:placeholder-neutral-600 outline-none"
           />
-          <kbd className="hidden sm:inline-flex items-center rounded border border-white/[0.08] bg-white/[0.04] px-1.5 py-0.5 text-[10px] text-neutral-500">
+          <kbd className="hidden sm:inline-flex items-center rounded border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] text-neutral-500">
             ESC
           </kbd>
         </div>
@@ -139,8 +139,8 @@ export function SearchModal() {
                 onMouseEnter={() => setSelectedIndex(i)}
                 className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors ${
                   i === selectedIndex
-                    ? "bg-white/[0.08]"
-                    : "hover:bg-white/[0.04]"
+                    ? "bg-neutral-100 dark:bg-neutral-800"
+                    : "hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
                 }`}
               >
                 {/* Thumbnail */}
@@ -148,27 +148,27 @@ export function SearchModal() {
                   <img
                     src={`/screenshots/${item.screenshot}`}
                     alt=""
-                    className="h-10 w-16 shrink-0 rounded-md object-cover object-top bg-neutral-800"
+                    className="h-10 w-16 shrink-0 rounded-md object-cover object-top bg-neutral-100 dark:bg-neutral-800"
                   />
                 ) : (
-                  <div className="h-10 w-16 shrink-0 rounded-md bg-neutral-800 flex items-center justify-center">
-                    <svg className="h-4 w-4 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <div className="h-10 w-16 shrink-0 rounded-md bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+                    <svg className="h-4 w-4 text-neutral-300 dark:text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0 0 22.5 18.75V5.25A2.25 2.25 0 0 0 20.25 3H3.75A2.25 2.25 0 0 0 1.5 5.25v13.5A2.25 2.25 0 0 0 3.75 21Z" />
                     </svg>
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm font-medium text-neutral-200 truncate">
+                  <div className="text-sm font-medium text-neutral-800 dark:text-neutral-200 truncate">
                     {item.title || item.sourceDomain || (() => { try { return new URL(item.url).hostname; } catch { return item.url; } })()}
                   </div>
                   <div className="flex items-center gap-2 mt-0.5">
                     {item.sourceDomain && (
-                      <span className="text-[10px] text-neutral-500 truncate">
+                      <span className="text-xs text-neutral-500 truncate">
                         {item.sourceDomain}
                       </span>
                     )}
                     {item.contentType && item.contentType !== "website" && (
-                      <span className="rounded bg-white/[0.06] px-1.5 py-0.5 text-[9px] text-neutral-500">
+                      <span className="rounded bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 text-[10px] text-neutral-500">
                         {item.contentType}
                       </span>
                     )}
@@ -176,12 +176,12 @@ export function SearchModal() {
                 </div>
                 {item.verdict && (
                   <span
-                    className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold ${
+                    className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${
                       item.verdict === "like"
-                        ? "bg-emerald-500/20 text-emerald-400"
+                        ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
                         : item.verdict === "dislike"
-                          ? "bg-red-500/20 text-red-400"
-                          : "bg-neutral-700 text-neutral-400"
+                          ? "bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400"
+                          : "bg-neutral-200 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400"
                     }`}
                   >
                     {item.verdict === "like" ? "LIKE" : item.verdict === "dislike" ? "PASS" : "DEL"}
@@ -191,11 +191,11 @@ export function SearchModal() {
             ))}
           </div>
         ) : query && !loading ? (
-          <div className="px-4 py-8 text-center text-sm text-neutral-600">
+          <div className="px-4 py-8 text-center text-sm text-neutral-500 dark:text-neutral-600">
             검색 결과가 없습니다
           </div>
         ) : !query ? (
-          <div className="px-4 py-6 text-center text-xs text-neutral-600">
+          <div className="px-4 py-6 text-center text-sm text-neutral-500 dark:text-neutral-600">
             제목, URL, 태그, 도메인으로 검색
           </div>
         ) : null}

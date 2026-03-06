@@ -91,19 +91,19 @@ export function HashtagInput({
   };
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-3">
       {/* Current tags */}
       {currentTags.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {currentTags.map((tag) => (
             <span
               key={tag.id}
-              className="group inline-flex items-center gap-1 rounded-lg bg-white/[0.05] border border-white/[0.06] px-2.5 py-1 text-xs text-neutral-300 transition-colors hover:border-white/[0.1]"
+              className="group inline-flex items-center gap-1 rounded-lg bg-neutral-100 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700/50 px-2.5 py-1 text-sm text-neutral-700 dark:text-neutral-300 transition-colors hover:border-neutral-300 dark:hover:border-neutral-600"
             >
               #{tag.name}
               <button
                 onClick={() => removeTag(tag.id)}
-                className="ml-0.5 rounded-full p-0.5 text-neutral-600 transition-colors hover:bg-red-500/20 hover:text-red-400"
+                className="ml-0.5 rounded-full p-0.5 text-neutral-400 dark:text-neutral-600 transition-colors hover:bg-red-100 dark:hover:bg-red-500/20 hover:text-red-500 dark:hover:text-red-400"
               >
                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -116,9 +116,9 @@ export function HashtagInput({
 
       {/* Input */}
       <div className="relative">
-        <div className="flex items-center rounded-lg border border-white/[0.06] bg-white/[0.02] transition-colors focus-within:border-white/[0.15] focus-within:bg-white/[0.04]">
+        <div className="flex items-center rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30 transition-colors focus-within:border-neutral-400 dark:focus-within:border-neutral-600 focus-within:bg-white dark:focus-within:bg-neutral-800/50">
           <svg
-            className="ml-2.5 h-3.5 w-3.5 text-neutral-600 shrink-0"
+            className="ml-3 h-4 w-4 text-neutral-400 dark:text-neutral-600 shrink-0"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -135,13 +135,13 @@ export function HashtagInput({
             onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
             onKeyDown={handleKeyDown}
             placeholder="태그 추가..."
-            className="w-full bg-transparent py-2 pl-2 pr-3 text-xs text-neutral-200 placeholder-neutral-600 outline-none"
+            className="w-full bg-transparent py-2.5 pl-2 pr-3 text-sm text-neutral-800 dark:text-neutral-200 placeholder-neutral-400 dark:placeholder-neutral-600 outline-none"
           />
         </div>
 
         {/* Suggestions */}
         {showSuggestions && suggestions.length > 0 && (
-          <div className="absolute z-10 mt-1.5 w-full rounded-xl border border-white/[0.08] bg-neutral-900 p-1 shadow-2xl shadow-black/40">
+          <div className="absolute z-10 mt-1.5 w-full rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 p-1 shadow-2xl shadow-black/10 dark:shadow-black/40">
             {suggestions.map((tag, index) => (
               <button
                 key={tag.id}
@@ -150,14 +150,14 @@ export function HashtagInput({
                   addTag(tag.name);
                 }}
                 onMouseEnter={() => setSelectedIndex(index)}
-                className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-xs transition-colors ${
+                className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm transition-colors ${
                   index === selectedIndex
-                    ? "bg-white/[0.08] text-white"
-                    : "text-neutral-400 hover:bg-white/[0.04]"
+                    ? "bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white"
+                    : "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
                 }`}
               >
                 <span>#{tag.name}</span>
-                <span className="text-neutral-600 text-[10px] tabular-nums">
+                <span className="text-neutral-400 dark:text-neutral-600 text-xs tabular-nums">
                   {tag.usageCount}
                 </span>
               </button>

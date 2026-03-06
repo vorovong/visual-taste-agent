@@ -66,12 +66,12 @@ export function ReferenceCard({
 
   return (
     <Link href={`/ref/${id}`} className="group block">
-      <div className="relative overflow-hidden rounded-xl border border-white/[0.06] bg-neutral-900/80 transition-all duration-300 hover:border-white/[0.12] hover:shadow-2xl hover:shadow-black/40 hover:-translate-y-1">
+      <div className="relative overflow-hidden rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/80 transition-all duration-300 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-xl dark:hover:shadow-black/40 hover:-translate-y-1">
         {/* Thumbnail */}
-        <div className="relative aspect-[16/10] overflow-hidden bg-neutral-800/50">
+        <div className="relative aspect-[16/10] overflow-hidden bg-neutral-100 dark:bg-neutral-800/50">
           {/* Skeleton pulse */}
           {displayShot && !imgLoaded && (
-            <div className="absolute inset-0 animate-pulse bg-neutral-800" />
+            <div className="absolute inset-0 animate-pulse bg-neutral-200 dark:bg-neutral-800" />
           )}
           {displayShot ? (
             <img
@@ -86,7 +86,7 @@ export function ReferenceCard({
           ) : (
             <div className="flex h-full items-center justify-center">
               <svg
-                className="h-8 w-8 text-neutral-700"
+                className="h-8 w-8 text-neutral-300 dark:text-neutral-700"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -105,26 +105,26 @@ export function ReferenceCard({
           {badge && (
             <div className="absolute top-2.5 right-2.5">
               <span
-                className={`inline-block rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wider text-white shadow-lg ${badge.bg} ${badge.glow}`}
+                className={`inline-block rounded-md px-2.5 py-1 text-xs font-bold tracking-wider text-white shadow-lg ${badge.bg} ${badge.glow}`}
               >
                 {badge.label}
               </span>
             </div>
           )}
 
-          {/* Quick verdict overlay on hover (未評価 only) */}
+          {/* Quick verdict overlay on hover */}
           {!verdict && (
             <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               <div className="flex w-full gap-2 p-3">
                 <button
                   onClick={(e) => handleQuickVerdict(e, "like")}
-                  className="flex-1 rounded-lg bg-emerald-500/90 py-2 text-xs font-semibold text-white backdrop-blur-sm transition-colors hover:bg-emerald-500"
+                  className="flex-1 rounded-lg bg-emerald-500/90 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-emerald-500"
                 >
                   LIKE
                 </button>
                 <button
                   onClick={(e) => handleQuickVerdict(e, "dislike")}
-                  className="flex-1 rounded-lg bg-white/10 py-2 text-xs font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+                  className="flex-1 rounded-lg bg-white/10 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
                 >
                   PASS
                 </button>
@@ -134,35 +134,35 @@ export function ReferenceCard({
         </div>
 
         {/* Info */}
-        <div className="p-3.5 space-y-1.5">
+        <div className="p-4 space-y-2">
           {/* Domain + content type */}
           <div className="flex items-center gap-1.5">
             {sourceDomain && (
-              <span className="text-[10px] text-neutral-500 truncate">
+              <span className="text-xs text-neutral-500 truncate">
                 {sourceDomain}
               </span>
             )}
             {contentType && contentType !== "website" && (
-              <span className="shrink-0 rounded bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 text-[9px] font-medium text-blue-400">
+              <span className="shrink-0 rounded bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 px-1.5 py-0.5 text-[10px] font-medium text-blue-700 dark:text-blue-400">
                 {contentType}
               </span>
             )}
           </div>
-          <h3 className="text-[13px] font-medium text-neutral-200 leading-tight line-clamp-1">
+          <h3 className="text-sm font-medium text-neutral-800 dark:text-neutral-200 leading-tight line-clamp-1">
             {title || sourceDomain || (() => { try { return new URL(url).hostname; } catch { return url; } })()}
           </h3>
           {hashtags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-1.5">
               {hashtags.slice(0, 3).map((tag) => (
                 <span
                   key={tag.id}
-                  className="rounded-md bg-white/[0.05] px-1.5 py-0.5 text-[10px] text-neutral-500 transition-colors group-hover:text-neutral-400"
+                  className="rounded-md bg-neutral-100 dark:bg-neutral-800/50 px-2 py-0.5 text-xs text-neutral-500 dark:text-neutral-500 transition-colors group-hover:text-neutral-700 dark:group-hover:text-neutral-400"
                 >
                   #{tag.name}
                 </span>
               ))}
               {hashtags.length > 3 && (
-                <span className="text-[10px] text-neutral-600">
+                <span className="text-xs text-neutral-400 dark:text-neutral-600">
                   +{hashtags.length - 3}
                 </span>
               )}
