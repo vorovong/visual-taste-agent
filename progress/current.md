@@ -2,11 +2,13 @@
 
 ## 현재 상태
 
-- **단계**: M1~M10 전체 구현 완료. 배포 대기 중 (Fly.io CLI 설치 필요).
-- **완료**: DB, 봇, Puppeteer, 웹앱(인증+갤러리+상세+평가+대시보드), UI 엘리베이션, 에이전트 DB 연동, Docker+Fly.io 설정
-- **검증**: Playwright 16/16 E2E 통과. 빌드 성공.
-- **다음**: `flyctl` 설치 -> `fly auth login` -> `fly launch` -> 배포
-- **블로커**: flyctl CLI 미설치
+- **단계**: M1~M10 전체 구현 + Fly.io 배포 완료!
+- **완료**: DB, 봇, Puppeteer, 웹앱(인증+갤러리+상세+평가+대시보드), UI 엘리베이션, 에이전트 DB 연동, Docker+Fly.io 배포
+- **검증**: Playwright 16/16 E2E 통과. 빌드 성공. 배포 성공.
+- **URL**: https://visual-taste-agent.fly.dev/
+- **남은 작업**: 없음 (Google OAuth 리디렉션 URI 추가 완료)
+- **블로커**: 없음
+- **GitHub**: https://github.com/minhokim/visual-taste-agent
 
 ---
 
@@ -64,9 +66,9 @@ flyctl deploy
 ### Phase 4: 에이전트 통합 (완료)
 - [x] M9: GET /api/agent/data, 에이전트 정의 업데이트, profile.md 자동 생성
 
-### Phase 5: 배포 (코드 준비 완료, CLI 대기)
+### Phase 5: 배포 (완료)
 - [x] M10: 보안 헤더, Dockerfile, fly.toml, docker-entrypoint.sh
-- [ ] 실제 Fly.io 배포 (flyctl 설치 후)
+- [x] 실제 Fly.io 배포 완료 (2026-03-06)
 
 ---
 
@@ -103,6 +105,8 @@ flyctl deploy
 | 03-06 | Fly.io 무료 티어 배포 | 비용 0, Puppeteer 지원 |
 | 03-06 | standalone output + Chromium | Docker 최적화 |
 | 03-06 | 봇+웹앱 단일 컨테이너 | SQLite 공유, 단순화 |
+| 03-06 | force-dynamic DB 페이지 | 빌드 시 SSG가 DB 접근 방지 |
+| 03-06 | AUTH_TRUST_HOST=true | Fly.io 프록시 뒤 NextAuth 필수 |
 
 ---
 
