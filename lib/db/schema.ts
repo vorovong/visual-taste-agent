@@ -11,6 +11,9 @@ export const references = sqliteTable("references", {
   iframeAllowed: integer("iframe_allowed", { mode: "boolean" }),
   capturedAt: text("captured_at").notNull(),
   evaluatedAt: text("evaluated_at"),
+  sourceDomain: text("source_domain"),
+  contentType: text("content_type").default("website"),
+  originalFilename: text("original_filename"),
 });
 
 export const screenshots = sqliteTable("screenshots", {

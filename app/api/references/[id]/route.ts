@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { db, schema } from "@/lib/db/index";
 import { eq } from "drizzle-orm";
 
+function safeJSON(str: string | null): unknown {
+  if (!str) return null;
+  try { return JSON.parse(str); } catch { return null; }
+}
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -49,10 +54,10 @@ export async function GET(
     hashtags,
     metadata: metadata
       ? {
-          colors: metadata.colors ? JSON.parse(metadata.colors) : null,
-          fonts: metadata.fonts ? JSON.parse(metadata.fonts) : null,
-          layout: metadata.layout ? JSON.parse(metadata.layout) : null,
-          meta: metadata.meta ? JSON.parse(metadata.meta) : null,
+          colors: safeJSON(metadata.colors),
+          fonts: safeJSON(metadata.fonts),
+          layout: safeJSON(metadata.layout),
+          meta: safeJSON(metadata.meta),
         }
       : null,
   });

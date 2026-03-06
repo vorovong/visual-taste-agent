@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 
 import { Suspense } from "react";
 import { db, schema } from "@/lib/db/index";
-import { count, eq, isNull, desc } from "drizzle-orm";
+import { count, eq, isNull, isNotNull, desc, sql } from "drizzle-orm";
 import { GalleryClient } from "./gallery-client";
 
 async function getStats() {
@@ -26,12 +26,28 @@ async function getStats() {
     .orderBy(desc(schema.hashtags.usageCount))
     .limit(10);
 
+  // Content type counts
+  const ctRows = await db
+    .select({
+      ct: schema.references.contentType,
+      cnt: count(),
+    })
+    .from(schema.references)
+    .where(isNotNull(schema.references.contentType))
+    .groupBy(schema.references.contentType);
+
+  const contentTypes: Record<string, number> = {};
+  for (const row of ctRows) {
+    if (row.ct) contentTypes[row.ct] = row.cnt;
+  }
+
   return {
     total: total.count,
     liked: liked.count,
     disliked: disliked.count,
     pending: pending.count,
     topTags,
+    contentTypes,
   };
 }
 

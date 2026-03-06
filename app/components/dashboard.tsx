@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 
 interface DashboardProps {
@@ -10,6 +10,8 @@ interface DashboardProps {
     disliked: number;
     pending: number;
     topTags: { id: number; name: string; usageCount: number }[];
+    contentTypes?: Record<string, number>;
+    recent?: { id: number; title: string | null; url: string; capturedAt: string }[];
   };
 }
 
@@ -46,12 +48,110 @@ function StatCard({
   );
 }
 
+/* --- Level system --- */
+interface LevelInfo {
+  level: number;
+  label: string;
+  min: number;
+  max: number | null; // null = no upper bound
+}
+
+const LEVELS: LevelInfo[] = [
+  { level: 0, label: "수집 시작", min: 0, max: 4 },
+  { level: 1, label: "패턴 탐색", min: 5, max: 19 },
+  { level: 2, label: "취향 윤곽", min: 20, max: 49 },
+  { level: 3, label: "패턴 안정", min: 50, max: null },
+];
+
+function computeLevel(evaluated: number): {
+  current: LevelInfo;
+  next: LevelInfo | null;
+  progressInLevel: number; // 0-100
+  remaining: number;
+} {
+  let current = LEVELS[0];
+  for (const l of LEVELS) {
+    if (evaluated >= l.min) current = l;
+  }
+  const nextIdx = LEVELS.indexOf(current) + 1;
+  const next = nextIdx < LEVELS.length ? LEVELS[nextIdx] : null;
+
+  let progressInLevel = 100;
+  let remaining = 0;
+  if (next) {
+    const range = next.min - current.min;
+    const done = evaluated - current.min;
+    progressInLevel = Math.min(100, Math.round((done / range) * 100));
+    remaining = next.min - evaluated;
+  }
+
+  return { current, next, progressInLevel, remaining };
+}
+
+/* --- Time ago --- */
+function timeAgo(dateStr: string): string {
+  const now = Date.now();
+  const then = new Date(dateStr).getTime();
+  const diffMs = now - then;
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return "방금 전";
+  if (diffMin < 60) return `${diffMin}분 전`;
+  const diffHr = Math.floor(diffMin / 60);
+  if (diffHr < 24) return `${diffHr}시간 전`;
+  const diffDay = Math.floor(diffHr / 24);
+  if (diffDay < 30) return `${diffDay}일 전`;
+  return `${Math.floor(diffDay / 30)}개월 전`;
+}
+
+/* --- Domain extractor --- */
+function extractDomain(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}
+
 export function Dashboard({ stats }: DashboardProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   const evaluated = stats.liked + stats.disliked;
   const progressPercent =
     stats.total > 0 ? Math.round((evaluated / stats.total) * 100) : 0;
+
+  const levelInfo = useMemo(() => computeLevel(evaluated), [evaluated]);
+
+  // Taste DNA: top tags with percentages (based on topTags data)
+  const tasteDna = useMemo(() => {
+    if (!stats.topTags || stats.topTags.length === 0) return [];
+    const maxCount = stats.topTags[0].usageCount;
+    return stats.topTags.slice(0, 6).map((tag) => ({
+      ...tag,
+      percent: maxCount > 0 ? Math.round((tag.usageCount / maxCount) * 100) : 0,
+    }));
+  }, [stats.topTags]);
+
+  // Agent insight: simple data-driven one-liner
+  const insight = useMemo(() => {
+    if (!stats.topTags || stats.topTags.length === 0) {
+      if (stats.total === 0) return "레퍼런스를 수집해보세요. 텔레그램에서 URL을 보내면 시작됩니다.";
+      if (stats.pending > 0 && evaluated === 0) return `${stats.pending}개의 레퍼런스가 평가를 기다리고 있습니다. 좋아요/싫어요를 눌러보세요.`;
+      return "태그를 더 추가하면 취향 패턴이 나타납니다.";
+    }
+    const top = stats.topTags[0];
+    const totalUsage = stats.topTags.reduce((s, t) => s + t.usageCount, 0);
+    const topPercent = totalUsage > 0 ? Math.round((top.usageCount / totalUsage) * 100) : 0;
+    if (topPercent >= 40) {
+      return `태그 중 ${topPercent}%가 #${top.name} — 이 방향의 취향이 뚜렷합니다.`;
+    }
+    if (stats.topTags.length >= 3) {
+      const top3 = stats.topTags.slice(0, 3).map((t) => `#${t.name}`).join(", ");
+      return `자주 보이는 키워드: ${top3}. 패턴이 형성되고 있습니다.`;
+    }
+    return `#${top.name} 태그가 가장 많이 사용되었습니다.`;
+  }, [stats.topTags, stats.total, stats.pending, evaluated]);
+
+  const recentItems = stats.recent?.slice(0, 3) ?? [];
 
   return (
     <div className="rounded-xl border border-white/[0.06] bg-neutral-900/50">
@@ -62,6 +162,10 @@ export function Dashboard({ stats }: DashboardProps) {
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium text-neutral-300">
             대시보드
+          </span>
+          {/* Level badge */}
+          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-400">
+            Lv.{levelInfo.current.level} {levelInfo.current.label}
           </span>
           {stats.pending > 0 && (
             <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-400">
@@ -131,28 +235,64 @@ export function Dashboard({ stats }: DashboardProps) {
             />
           </div>
 
-          {/* Progress bar */}
-          {stats.total > 0 && (
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="text-neutral-500">평가 진행률</span>
-                <span className="text-neutral-400 tabular-nums">
-                  {evaluated}/{stats.total} ({progressPercent}%)
-                </span>
+          {/* Level progress + Evaluation progress — side by side on desktop */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {/* Level progress */}
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400 tabular-nums">
+                    Lv.{levelInfo.current.level}
+                  </span>
+                  <span className="text-[11px] text-neutral-400">{levelInfo.current.label}</span>
+                </div>
+                {levelInfo.next && (
+                  <span className="text-[10px] text-neutral-600 tabular-nums">
+                    Lv.{levelInfo.next.level}까지 {levelInfo.remaining}개
+                  </span>
+                )}
               </div>
               <div className="h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-500"
-                  style={{ width: `${progressPercent}%` }}
+                  className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                  style={{ width: `${levelInfo.progressInLevel}%` }}
                 />
               </div>
+              <div className="text-[10px] text-neutral-600">
+                {levelInfo.next
+                  ? `평가 ${evaluated}개 / 다음 레벨 ${levelInfo.next.min}개`
+                  : `평가 ${evaluated}개 — 최고 레벨 도달`}
+              </div>
             </div>
-          )}
+
+            {/* Evaluation progress */}
+            {stats.total > 0 && (
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-neutral-400">평가 진행률</span>
+                  <span className="text-[10px] text-neutral-500 tabular-nums">
+                    {evaluated}/{stats.total} ({progressPercent}%)
+                  </span>
+                </div>
+                <div className="h-1.5 rounded-full bg-white/[0.04] overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-500"
+                    style={{ width: `${progressPercent}%` }}
+                  />
+                </div>
+                <div className="text-[10px] text-neutral-600">
+                  {stats.pending > 0
+                    ? `미평가 ${stats.pending}개 남음`
+                    : "모든 레퍼런스 평가 완료"}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Pending CTA */}
           {stats.pending > 0 && (
             <Link
-              href="/?verdict=pending"
+              href="/evaluate"
               className="group flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 p-3 text-sm font-medium text-amber-400 transition-all hover:from-amber-500/20 hover:to-orange-500/20 hover:border-amber-500/30"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -162,7 +302,99 @@ export function Dashboard({ stats }: DashboardProps) {
             </Link>
           )}
 
-          {/* Top tags */}
+          {/* Taste DNA + Recent — side by side on desktop */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {/* Taste DNA bar chart */}
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
+              <div className="text-[11px] text-neutral-500 mb-2.5 uppercase tracking-wider flex items-center gap-1.5">
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+                </svg>
+                취향 DNA
+              </div>
+              {tasteDna.length > 0 ? (
+                <div className="space-y-2">
+                  {tasteDna.map((tag) => (
+                    <Link
+                      key={tag.id}
+                      href={`/?tag=${tag.name}`}
+                      className="group/bar block"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] text-neutral-400 w-20 truncate group-hover/bar:text-neutral-200 transition-colors">
+                          #{tag.name}
+                        </span>
+                        <div className="flex-1 h-[6px] rounded-full bg-white/[0.04] overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-emerald-500 transition-all duration-500 group-hover/bar:bg-emerald-400"
+                            style={{ width: `${tag.percent}%` }}
+                          />
+                        </div>
+                        <span className="text-[10px] text-neutral-600 tabular-nums w-6 text-right">
+                          {tag.usageCount}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-[11px] text-neutral-600 py-3 text-center">
+                  태그를 추가하면 취향 DNA가 나타납니다
+                </div>
+              )}
+            </div>
+
+            {/* Recent additions */}
+            <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
+              <div className="text-[11px] text-neutral-500 mb-2.5 uppercase tracking-wider flex items-center gap-1.5">
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                최근 추가
+              </div>
+              {recentItems.length > 0 ? (
+                <div className="space-y-1.5">
+                  {recentItems.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={`/ref/${item.id}`}
+                      className="group/recent flex items-center gap-3 rounded-lg p-1.5 -mx-1.5 transition-colors hover:bg-white/[0.04]"
+                    >
+                      <div className="h-10 w-10 flex-shrink-0 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center overflow-hidden">
+                        <svg className="h-4 w-4 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m9.07-9.07l4.5-4.5a4.5 4.5 0 016.364 6.364l-1.757 1.757" />
+                        </svg>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-xs text-neutral-300 truncate group-hover/recent:text-neutral-100 transition-colors">
+                          {item.title || extractDomain(item.url)}
+                        </div>
+                        <div className="text-[10px] text-neutral-600 truncate">
+                          {extractDomain(item.url)} · {timeAgo(item.capturedAt)}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-[11px] text-neutral-600 py-3 text-center">
+                  아직 수집된 레퍼런스가 없습니다
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Agent insight */}
+          <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 flex items-start gap-2.5">
+            <div className="flex-shrink-0 mt-0.5">
+              <svg className="h-3.5 w-3.5 text-emerald-500/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
+              </svg>
+            </div>
+            <p className="text-[11px] text-neutral-500 leading-relaxed">{insight}</p>
+          </div>
+
+          {/* Top tags (kept, more compact) */}
           {stats.topTags.length > 0 && (
             <div>
               <div className="text-[11px] text-neutral-500 mb-2 uppercase tracking-wider">

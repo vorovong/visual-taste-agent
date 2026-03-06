@@ -1,5 +1,33 @@
 @import "tailwindcss";
 
+/* Theme CSS custom properties */
+:root {
+  --background: 0 0% 98%;
+  --foreground: 0 0% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 3.9%;
+  --primary: 160 84% 39%;
+  --primary-foreground: 0 0% 98%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+  --border: 0 0% 90%;
+  --accent: 0 0% 96%;
+  --accent-foreground: 0 0% 9%;
+}
+.dark {
+  --background: 0 0% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 98%;
+  --primary: 160 84% 39%;
+  --primary-foreground: 0 0% 98%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 64%;
+  --border: 0 0% 15%;
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 98%;
+}
+
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
@@ -14,11 +42,11 @@ html {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.08);
+  background: hsl(var(--muted-foreground) / 0.15);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: hsl(var(--muted-foreground) / 0.25);
 }
 
 /* Skeleton animation */

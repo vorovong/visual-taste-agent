@@ -61,11 +61,24 @@ const migrations = [
   `CREATE INDEX IF NOT EXISTS idx_ref_hashtags_tag ON reference_hashtags(hashtag_id)`,
   `CREATE INDEX IF NOT EXISTS idx_design_metadata_ref ON design_metadata(reference_id)`,
   `CREATE INDEX IF NOT EXISTS idx_taste_log_ref ON taste_log(reference_id)`,
+  // M11: 매체 확장 마이그레이션
+  `ALTER TABLE "references" ADD COLUMN source_domain TEXT`,
+  `ALTER TABLE "references" ADD COLUMN content_type TEXT DEFAULT 'website'`,
+  `ALTER TABLE "references" ADD COLUMN original_filename TEXT`,
+  `CREATE INDEX IF NOT EXISTS idx_references_domain ON "references"(source_domain)`,
+  `CREATE INDEX IF NOT EXISTS idx_references_content_type ON "references"(content_type)`,
 ];
 
 export function runMigrations() {
   for (const sql of migrations) {
-    sqlite.exec(sql);
+    try {
+      sqlite.exec(sql);
+    } catch (e: unknown) {
+      // ALTER TABLE ADD COLUMN fails if column already exists — safe to ignore
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes("duplicate column name")) continue;
+      throw e;
+    }
   }
   console.log("Migrations complete.");
 }

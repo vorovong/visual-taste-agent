@@ -23,10 +23,28 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Inline script to prevent flash of wrong theme on page load.
+  // Runs synchronously before the body is painted.
+  const themeInitScript = `
+(function(){
+  try {
+    var t = localStorage.getItem('theme') || 'dark';
+    var d = t === 'system'
+      ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+      : t;
+    if (d === 'dark') document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  } catch(e){}
+})();
+`.trim();
+
   return (
-    <html lang="ko">
+    <html lang="ko" className="dark" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body
-        className={`${inter.variable} ${mono.variable} ${inter.className} bg-neutral-950 text-neutral-100 antialiased`}
+        className={`${inter.variable} ${mono.variable} ${inter.className} bg-[hsl(var(--background))] text-[hsl(var(--foreground))] antialiased`}
       >
         {children}
       </body>

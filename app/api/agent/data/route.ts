@@ -4,6 +4,11 @@ import { NextResponse } from "next/server";
 import { db, schema } from "@/lib/db/index";
 import { eq, desc, count, isNull } from "drizzle-orm";
 
+function safeJSON(str: string | null): unknown {
+  if (!str) return null;
+  try { return JSON.parse(str); } catch { return null; }
+}
+
 export async function GET() {
   // All references with screenshots, hashtags, metadata
   const refs = await db
@@ -42,10 +47,10 @@ export async function GET() {
         hashtags: hashtags.map((h) => h.name),
         metadata: metadata
           ? {
-              colors: metadata.colors ? JSON.parse(metadata.colors) : null,
-              fonts: metadata.fonts ? JSON.parse(metadata.fonts) : null,
-              layout: metadata.layout ? JSON.parse(metadata.layout) : null,
-              meta: metadata.meta ? JSON.parse(metadata.meta) : null,
+              colors: safeJSON(metadata.colors),
+              fonts: safeJSON(metadata.fonts),
+              layout: safeJSON(metadata.layout),
+              meta: safeJSON(metadata.meta),
             }
           : null,
       };

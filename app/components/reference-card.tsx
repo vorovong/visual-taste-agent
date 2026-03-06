@@ -8,6 +8,8 @@ interface ReferenceCardProps {
   url: string;
   title: string | null;
   verdict: string | null;
+  sourceDomain?: string | null;
+  contentType?: string | null;
   screenshots: { viewport: string; path: string }[];
   hashtags: { id: number; name: string }[];
   onVerdictChange?: (id: number, verdict: string) => void;
@@ -18,6 +20,8 @@ export function ReferenceCard({
   url,
   title,
   verdict,
+  sourceDomain,
+  contentType,
   screenshots,
   hashtags,
   onVerdictChange,
@@ -130,9 +134,22 @@ export function ReferenceCard({
         </div>
 
         {/* Info */}
-        <div className="p-3.5 space-y-2">
+        <div className="p-3.5 space-y-1.5">
+          {/* Domain + content type */}
+          <div className="flex items-center gap-1.5">
+            {sourceDomain && (
+              <span className="text-[10px] text-neutral-500 truncate">
+                {sourceDomain}
+              </span>
+            )}
+            {contentType && contentType !== "website" && (
+              <span className="shrink-0 rounded bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.5 text-[9px] font-medium text-blue-400">
+                {contentType}
+              </span>
+            )}
+          </div>
           <h3 className="text-[13px] font-medium text-neutral-200 leading-tight line-clamp-1">
-            {title || new URL(url).hostname}
+            {title || sourceDomain || (() => { try { return new URL(url).hostname; } catch { return url; } })()}
           </h3>
           {hashtags.length > 0 && (
             <div className="flex flex-wrap gap-1">

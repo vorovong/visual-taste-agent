@@ -1,5 +1,6 @@
 export type Verdict = "like" | "dislike" | "delete";
 export type SourceType = "url" | "image" | "file";
+export type ContentType = "website" | "presentation" | "poster" | "report" | "mobile-app" | "newsletter" | "other";
 export type Viewport = "mobile" | "tablet" | "desktop";
 export type DesignSystemStatus = "draft" | "stable" | "archived";
 
