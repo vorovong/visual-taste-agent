@@ -71,10 +71,10 @@ export function FilterBar({
             <button
               key={filter.value}
               onClick={() => updateParam("verdict", filter.value)}
-              className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all whitespace-nowrap ${
+              className={`flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-base font-medium transition-all whitespace-nowrap ${
                 currentVerdict === filter.value
                   ? "bg-white dark:bg-neutral-700/50 text-neutral-900 dark:text-white shadow-sm"
-                  : "text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700/30"
+                  : "text-neutral-600 dark:text-neutral-500 hover:text-neutral-900 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700/30"
               }`}
             >
               {filter.dot && (
@@ -82,7 +82,7 @@ export function FilterBar({
               )}
               {filter.label}
               {filter.count !== undefined && filter.count > 0 && (
-                <span className="text-xs text-neutral-400 dark:text-neutral-600 tabular-nums">
+                <span className="text-sm text-neutral-500 dark:text-neutral-500 tabular-nums">
                   {filter.count}
                 </span>
               )}
@@ -123,7 +123,7 @@ export function FilterBar({
                   updateParam("search", (e.target as HTMLInputElement).value);
                 }
               }}
-              className="w-36 bg-transparent py-2 pl-9 pr-3 text-sm text-neutral-800 dark:text-neutral-200 placeholder-neutral-400 dark:placeholder-neutral-600 outline-none sm:w-48"
+              className="w-40 bg-transparent py-2 pl-9 pr-3 text-base text-neutral-800 dark:text-neutral-200 placeholder-neutral-500 dark:placeholder-neutral-600 outline-none sm:w-52"
             />
           </div>
 
@@ -132,7 +132,7 @@ export function FilterBar({
             <select
               value={currentSort}
               onChange={(e) => updateParam("sort", e.target.value)}
-              className="appearance-none rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-800/30 py-2 pl-3 pr-8 text-sm text-neutral-600 dark:text-neutral-400 outline-none transition-colors hover:border-neutral-300 dark:hover:border-neutral-700 hover:text-neutral-800 dark:hover:text-neutral-300 focus:border-neutral-400 dark:focus:border-neutral-600"
+              className="appearance-none rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-800/30 py-2 pl-3 pr-8 text-base text-neutral-700 dark:text-neutral-400 outline-none transition-colors hover:border-neutral-300 dark:hover:border-neutral-700 hover:text-neutral-800 dark:hover:text-neutral-300 focus:border-neutral-400 dark:focus:border-neutral-600"
             >
               <option value="newest">최신순</option>
               <option value="oldest">오래된순</option>
@@ -163,15 +163,15 @@ export function FilterBar({
               <button
                 key={ct.value}
                 onClick={() => updateParam("content_type", ct.value)}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-all whitespace-nowrap ${
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-all whitespace-nowrap ${
                   currentContentType === ct.value
                     ? "bg-blue-50 dark:bg-blue-500/15 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20"
-                    : "text-neutral-500 border border-neutral-200 dark:border-neutral-800 hover:text-neutral-800 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-700"
+                    : "text-neutral-600 dark:text-neutral-500 border border-neutral-200 dark:border-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-700"
                 }`}
               >
                 {ct.label}
                 {count > 0 && (
-                  <span className="text-[10px] tabular-nums opacity-60">
+                  <span className="text-xs tabular-nums text-neutral-500 dark:text-neutral-500">
                     {count}
                   </span>
                 )}

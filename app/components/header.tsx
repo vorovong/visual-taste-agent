@@ -88,7 +88,7 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
                 <circle cx="12" cy="12" r="3" />
               </svg>
             </div>
-            <span className="text-sm font-semibold tracking-tight text-neutral-800 dark:text-neutral-200 transition-colors group-hover:text-neutral-900 dark:group-hover:text-white">
+            <span className="text-base font-bold tracking-tight text-neutral-900 dark:text-neutral-200 transition-colors group-hover:text-black dark:group-hover:text-white">
               VTA
             </span>
           </Link>
@@ -109,7 +109,7 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
             )}
             <Link
               href="/"
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-lg px-3 py-1.5 text-base font-medium transition-colors ${
                 pathname === "/"
                   ? "bg-neutral-100 dark:bg-white/[0.08] text-neutral-900 dark:text-white"
                   : "text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/[0.04]"
@@ -119,7 +119,7 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
             </Link>
             <Link
               href="/evaluate"
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-lg px-3 py-1.5 text-base font-medium transition-colors ${
                 pathname === "/evaluate"
                   ? "bg-neutral-100 dark:bg-white/[0.08] text-neutral-900 dark:text-white"
                   : "text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-white/[0.04]"
@@ -169,11 +169,11 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
                 key={tab.key}
                 href={tab.href}
                 className={`relative flex flex-1 flex-col items-center gap-1 py-2.5 min-h-[48px] justify-center transition-colors ${
-                  tab.isActive ? tab.activeColor : "text-neutral-400 dark:text-neutral-600"
+                  tab.isActive ? tab.activeColor : "text-neutral-500 dark:text-neutral-500"
                 }`}
               >
                 {tab.icon}
-                <span className="text-[10px] font-medium">{tab.label}</span>
+                <span className="text-xs font-semibold">{tab.label}</span>
                 {tab.badge && (
                   <span className="absolute top-1 right-1/4 flex h-4 min-w-4 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-bold text-white dark:text-black">
                     {tab.badge}

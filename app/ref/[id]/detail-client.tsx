@@ -145,7 +145,7 @@ export function DetailClient({
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
               </svg>
-              <span className="hidden sm:inline text-sm">갤러리</span>
+              <span className="hidden sm:inline text-base">갤러리</span>
             </Link>
             <div className="h-4 w-px bg-neutral-200 dark:bg-neutral-800 hidden sm:block" />
             <span className="min-w-0 truncate text-base font-medium text-neutral-800 dark:text-neutral-200">
@@ -194,7 +194,7 @@ export function DetailClient({
               href={reference.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800/50 px-3.5 py-2 text-sm font-medium text-neutral-600 dark:text-neutral-400 transition-all hover:bg-neutral-100 dark:hover:bg-neutral-700/50 hover:text-neutral-900 dark:hover:text-neutral-200"
+              className="flex items-center gap-1.5 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800/50 px-3.5 py-2 text-base font-medium text-neutral-700 dark:text-neutral-400 transition-all hover:bg-neutral-100 dark:hover:bg-neutral-700/50 hover:text-neutral-900 dark:hover:text-neutral-200"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
@@ -240,7 +240,7 @@ export function DetailClient({
                       setShowIframe(false);
                     }}
                     disabled={!hasShot}
-                    className={`flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-all ${
+                    className={`flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-base font-medium transition-all ${
                       currentViewport === vp && !showIframe
                         ? "bg-white dark:bg-neutral-700/50 text-neutral-900 dark:text-white shadow-sm"
                         : hasShot
@@ -260,7 +260,7 @@ export function DetailClient({
                   <div className="h-5 w-px bg-neutral-200 dark:bg-neutral-700" />
                   <button
                     onClick={() => setShowIframe(!showIframe)}
-                    className={`flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-medium transition-all ${
+                    className={`flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-base font-medium transition-all ${
                       showIframe
                         ? "bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400"
                         : "text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700/30"
@@ -340,7 +340,7 @@ export function DetailClient({
 
             {/* Verdict */}
             <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 p-5 space-y-4">
-              <div className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+              <div className="text-base font-bold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider">
                 평가
               </div>
               <div className="grid grid-cols-3 gap-2.5">
@@ -348,7 +348,7 @@ export function DetailClient({
                   <button
                     key={btn.value}
                     onClick={() => handleVerdict(btn.value)}
-                    className={`flex flex-col items-center gap-2 rounded-xl py-5 min-h-[56px] text-sm font-semibold transition-all ${
+                    className={`flex flex-col items-center gap-2 rounded-xl py-5 min-h-[56px] text-base font-bold transition-all ${
                       verdict === btn.value
                         ? btn.activeClass
                         : btn.inactiveClass
@@ -363,7 +363,7 @@ export function DetailClient({
 
             {/* Hashtags */}
             <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 p-5 space-y-4">
-              <div className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+              <div className="text-base font-bold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider">
                 태그
               </div>
               <HashtagInput
@@ -376,14 +376,14 @@ export function DetailClient({
             {/* Design Metadata */}
             {metadata && (
               <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 p-5 space-y-5">
-                <div className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+                <div className="text-base font-bold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider">
                   디자인 메타데이터
                 </div>
 
                 {/* Colors */}
                 {metadata.colors && (
                   <div className="space-y-2.5">
-                    <div className="text-sm text-neutral-600 dark:text-neutral-400">Colors</div>
+                    <div className="text-base text-neutral-700 dark:text-neutral-400">Colors</div>
                     <div className="flex flex-wrap gap-2.5">
                       {[
                         ...(metadata.colors.background || []),
@@ -419,18 +419,18 @@ export function DetailClient({
                 {/* Fonts */}
                 {metadata.fonts && metadata.fonts.length > 0 && (
                   <div className="space-y-2.5">
-                    <div className="text-sm text-neutral-600 dark:text-neutral-400">Fonts</div>
+                    <div className="text-base text-neutral-700 dark:text-neutral-400">Fonts</div>
                     <div className="space-y-2">
                       {metadata.fonts.slice(0, 4).map((font, i) => (
                         <div
                           key={i}
-                          className="flex items-baseline gap-2 text-sm"
+                          className="flex items-baseline gap-2 text-base"
                         >
                           <span className="font-medium text-neutral-800 dark:text-neutral-300">
                             {font.family}
                           </span>
                           {(font.size || font.weight) && (
-                            <span className="text-neutral-400 dark:text-neutral-600 font-[family-name:var(--font-mono)] text-xs">
+                            <span className="text-neutral-500 dark:text-neutral-500 font-[family-name:var(--font-mono)] text-sm">
                               {font.size}
                               {font.size && font.weight && " / "}
                               {font.weight && `w${font.weight}`}
@@ -445,8 +445,8 @@ export function DetailClient({
                 {/* Layout */}
                 {metadata.layout && (
                   <div className="space-y-2">
-                    <div className="text-sm text-neutral-600 dark:text-neutral-400">Layout</div>
-                    <div className="text-sm text-neutral-800 dark:text-neutral-300 font-[family-name:var(--font-mono)]">
+                    <div className="text-base text-neutral-700 dark:text-neutral-400">Layout</div>
+                    <div className="text-base text-neutral-800 dark:text-neutral-300 font-[family-name:var(--font-mono)]">
                       {metadata.layout.type}
                       {metadata.layout.columns &&
                         ` (${metadata.layout.columns}cols)`}
@@ -459,17 +459,17 @@ export function DetailClient({
                   (metadata.meta.framework ||
                     (metadata.meta.libraries && metadata.meta.libraries.length > 0)) && (
                     <div className="space-y-2.5">
-                      <div className="text-sm text-neutral-600 dark:text-neutral-400">Stack</div>
+                      <div className="text-base text-neutral-700 dark:text-neutral-400">Stack</div>
                       <div className="flex flex-wrap gap-2">
                         {metadata.meta.framework && (
-                          <span className="rounded-md bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 px-2.5 py-1 text-xs font-medium text-blue-700 dark:text-blue-400">
+                          <span className="rounded-md bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 px-2.5 py-1 text-sm font-medium text-blue-700 dark:text-blue-400">
                             {metadata.meta.framework}
                           </span>
                         )}
                         {metadata.meta.libraries?.map((lib, i) => (
                           <span
                             key={i}
-                            className="rounded-md bg-neutral-100 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700/50 px-2.5 py-1 text-xs text-neutral-600 dark:text-neutral-500"
+                            className="rounded-md bg-neutral-100 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700/50 px-2.5 py-1 text-sm text-neutral-700 dark:text-neutral-500"
                           >
                             {lib}
                           </span>
@@ -482,25 +482,25 @@ export function DetailClient({
 
             {/* Meta info */}
             <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 p-5 space-y-4">
-              <div className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
+              <div className="text-base font-bold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider">
                 정보
               </div>
-              <div className="space-y-3 text-sm">
+              <div className="space-y-3 text-base">
                 <div className="flex items-center justify-between">
-                  <span className="text-neutral-500">ID</span>
+                  <span className="text-neutral-600 dark:text-neutral-500">ID</span>
                   <span className="text-neutral-800 dark:text-neutral-300 font-[family-name:var(--font-mono)]">
                     {reference.id}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-neutral-500">수집</span>
+                  <span className="text-neutral-600 dark:text-neutral-500">수집</span>
                   <span className="text-neutral-800 dark:text-neutral-300">
                     {new Date(reference.capturedAt).toLocaleDateString("ko-KR")}
                   </span>
                 </div>
                 {reference.evaluatedAt && (
                   <div className="flex items-center justify-between">
-                    <span className="text-neutral-500">평가</span>
+                    <span className="text-neutral-600 dark:text-neutral-500">평가</span>
                     <span className="text-neutral-800 dark:text-neutral-300">
                       {new Date(reference.evaluatedAt).toLocaleDateString(
                         "ko-KR"
@@ -509,7 +509,7 @@ export function DetailClient({
                   </div>
                 )}
                 <div className="flex items-center justify-between">
-                  <span className="text-neutral-500">iframe</span>
+                  <span className="text-neutral-600 dark:text-neutral-500">iframe</span>
                   <span
                     className={
                       reference.iframeAllowed
@@ -528,7 +528,7 @@ export function DetailClient({
         {/* Related References */}
         {relatedRefs.length > 0 && (
           <div className="mt-10 space-y-5">
-            <h2 className="text-base font-semibold text-neutral-700 dark:text-neutral-300">관련 레퍼런스</h2>
+            <h2 className="text-lg font-bold text-neutral-800 dark:text-neutral-300">관련 레퍼런스</h2>
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
               {relatedRefs.map((r) => (
                 <Link
@@ -552,7 +552,7 @@ export function DetailClient({
                     )}
                   </div>
                   <div className="p-3 space-y-1.5">
-                    <p className="truncate text-sm font-medium text-neutral-700 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white">
+                    <p className="truncate text-base font-semibold text-neutral-800 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white">
                       {r.title || r.sourceDomain || (() => { try { return new URL(r.url).hostname; } catch { return r.url; } })()}
                     </p>
                     <div className="flex items-center gap-1.5">
@@ -563,7 +563,7 @@ export function DetailClient({
                         <span className="h-2 w-2 rounded-full bg-red-500" />
                       )}
                       {r.sharedTags > 0 && (
-                        <span className="text-xs text-neutral-400 dark:text-neutral-600">
+                        <span className="text-sm text-neutral-500 dark:text-neutral-500">
                           태그 {r.sharedTags}개 공유
                         </span>
                       )}

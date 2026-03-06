@@ -138,17 +138,17 @@ export function ReferenceCard({
           {/* Domain + content type */}
           <div className="flex items-center gap-1.5">
             {sourceDomain && (
-              <span className="text-xs text-neutral-500 truncate">
+              <span className="text-sm text-neutral-600 dark:text-neutral-500 truncate">
                 {sourceDomain}
               </span>
             )}
             {contentType && contentType !== "website" && (
-              <span className="shrink-0 rounded bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 px-1.5 py-0.5 text-[10px] font-medium text-blue-700 dark:text-blue-400">
+              <span className="shrink-0 rounded bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-400">
                 {contentType}
               </span>
             )}
           </div>
-          <h3 className="text-sm font-medium text-neutral-800 dark:text-neutral-200 leading-tight line-clamp-1">
+          <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-200 leading-tight line-clamp-1">
             {title || sourceDomain || (() => { try { return new URL(url).hostname; } catch { return url; } })()}
           </h3>
           {hashtags.length > 0 && (
@@ -156,13 +156,13 @@ export function ReferenceCard({
               {hashtags.slice(0, 3).map((tag) => (
                 <span
                   key={tag.id}
-                  className="rounded-md bg-neutral-100 dark:bg-neutral-800/50 px-2 py-0.5 text-xs text-neutral-500 dark:text-neutral-500 transition-colors group-hover:text-neutral-700 dark:group-hover:text-neutral-400"
+                  className="rounded-md bg-neutral-100 dark:bg-neutral-800/50 px-2 py-0.5 text-sm text-neutral-600 dark:text-neutral-500 transition-colors group-hover:text-neutral-800 dark:group-hover:text-neutral-400"
                 >
                   #{tag.name}
                 </span>
               ))}
               {hashtags.length > 3 && (
-                <span className="text-xs text-neutral-400 dark:text-neutral-600">
+                <span className="text-sm text-neutral-500 dark:text-neutral-500">
                   +{hashtags.length - 3}
                 </span>
               )}

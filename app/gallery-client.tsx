@@ -168,7 +168,7 @@ export function GalleryClient({ stats: initialStats }: { stats: Stats }) {
         />
 
         {!loading && refs.length > 0 && (
-          <div className="text-xs text-neutral-500 dark:text-neutral-500 tabular-nums">
+          <div className="text-sm text-neutral-600 dark:text-neutral-500 tabular-nums">
             {refs.length}개의 레퍼런스
             {nextCursor && " (더 있음)"}
           </div>
@@ -189,8 +189,8 @@ export function GalleryClient({ stats: initialStats }: { stats: Stats }) {
                 </svg>
               </div>
               <div>
-                <p className="text-base font-medium text-neutral-700 dark:text-neutral-300">레퍼런스가 없습니다</p>
-                <p className="mt-1 text-sm text-neutral-500 leading-relaxed">
+                <p className="text-lg font-semibold text-neutral-800 dark:text-neutral-300">레퍼런스가 없습니다</p>
+                <p className="mt-1 text-base text-neutral-600 dark:text-neutral-500 leading-relaxed">
                   텔레그램 봇에서 URL이나 파일을 보내면<br />여기에 자동으로 수집됩니다
                 </p>
               </div>
