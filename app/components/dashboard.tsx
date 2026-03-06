@@ -26,22 +26,30 @@ function StatCard({
   accent?: string;
   icon: React.ReactNode;
 }) {
-  const colorClasses: Record<string, string> = {
-    emerald: "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20",
-    red: "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20",
-    amber: "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/20",
-    default: "text-neutral-800 dark:text-neutral-200 bg-neutral-50 dark:bg-neutral-800/50 border-neutral-200 dark:border-neutral-700/50",
+  const bgClasses: Record<string, string> = {
+    emerald: "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-500/30",
+    red: "bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-500/30",
+    amber: "bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-500/30",
+    default: "bg-neutral-50 dark:bg-neutral-800/60 border-neutral-200 dark:border-neutral-700/50",
   };
 
-  const cls = colorClasses[accent || "default"];
+  const iconClasses: Record<string, string> = {
+    emerald: "text-emerald-600 dark:text-emerald-400",
+    red: "text-red-600 dark:text-red-400",
+    amber: "text-amber-600 dark:text-amber-400",
+    default: "text-neutral-400 dark:text-neutral-500",
+  };
+
+  const bg = bgClasses[accent || "default"];
+  const ic = iconClasses[accent || "default"];
 
   return (
-    <div className={`rounded-xl border p-5 ${cls}`}>
+    <div className={`rounded-xl border p-5 ${bg}`}>
       <div className="flex items-center justify-between">
-        <div className="text-4xl font-bold tabular-nums">{value}</div>
-        <div className="opacity-60 dark:opacity-40">{icon}</div>
+        <div className="text-4xl font-bold tabular-nums text-neutral-900 dark:text-white">{value}</div>
+        <div className={ic}>{icon}</div>
       </div>
-      <div className="mt-2 text-sm font-semibold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
+      <div className="mt-2 text-sm font-semibold uppercase tracking-widest text-neutral-600 dark:text-neutral-300">
         {label}
       </div>
     </div>
@@ -235,16 +243,16 @@ export function Dashboard({ stats }: DashboardProps) {
           {/* Level progress + Evaluation progress */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {/* Level progress */}
-            <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30 p-4 space-y-2.5">
+            <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/60 p-4 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="rounded-full bg-emerald-100 dark:bg-emerald-500/10 px-2.5 py-0.5 text-sm font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">
                     Lv.{levelInfo.current.level}
                   </span>
-                  <span className="text-base font-medium text-neutral-700 dark:text-neutral-400">{levelInfo.current.label}</span>
+                  <span className="text-base font-medium text-neutral-700 dark:text-neutral-200">{levelInfo.current.label}</span>
                 </div>
                 {levelInfo.next && (
-                  <span className="text-sm text-neutral-500 dark:text-neutral-500 tabular-nums">
+                  <span className="text-sm text-neutral-500 dark:text-neutral-400 tabular-nums">
                     Lv.{levelInfo.next.level}까지 {levelInfo.remaining}개
                   </span>
                 )}
@@ -255,7 +263,7 @@ export function Dashboard({ stats }: DashboardProps) {
                   style={{ width: `${levelInfo.progressInLevel}%` }}
                 />
               </div>
-              <div className="text-sm text-neutral-600 dark:text-neutral-500">
+              <div className="text-sm text-neutral-600 dark:text-neutral-400">
                 {levelInfo.next
                   ? `평가 ${evaluated}개 / 다음 레벨 ${levelInfo.next.min}개`
                   : `평가 ${evaluated}개 — 최고 레벨 도달`}
@@ -264,10 +272,10 @@ export function Dashboard({ stats }: DashboardProps) {
 
             {/* Evaluation progress */}
             {stats.total > 0 && (
-              <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30 p-4 space-y-2.5">
+              <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/60 p-4 space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-base font-medium text-neutral-700 dark:text-neutral-400">평가 진행률</span>
-                  <span className="text-sm text-neutral-500 dark:text-neutral-500 tabular-nums">
+                  <span className="text-base font-medium text-neutral-700 dark:text-neutral-200">평가 진행률</span>
+                  <span className="text-sm text-neutral-500 dark:text-neutral-400 tabular-nums">
                     {evaluated}/{stats.total} ({progressPercent}%)
                   </span>
                 </div>
@@ -277,7 +285,7 @@ export function Dashboard({ stats }: DashboardProps) {
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
-                <div className="text-sm text-neutral-600 dark:text-neutral-500">
+                <div className="text-sm text-neutral-600 dark:text-neutral-400">
                   {stats.pending > 0
                     ? `미평가 ${stats.pending}개 남음`
                     : "모든 레퍼런스 평가 완료"}
@@ -302,8 +310,8 @@ export function Dashboard({ stats }: DashboardProps) {
           {/* Taste DNA + Recent */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {/* Taste DNA bar chart */}
-            <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30 p-4">
-              <div className="text-base font-semibold text-neutral-700 dark:text-neutral-400 mb-3 uppercase tracking-wider flex items-center gap-1.5">
+            <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/60 p-4">
+              <div className="text-base font-semibold text-neutral-700 dark:text-neutral-200 mb-3 uppercase tracking-wider flex items-center gap-1.5">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
                 </svg>
@@ -318,7 +326,7 @@ export function Dashboard({ stats }: DashboardProps) {
                       className="group/bar block"
                     >
                       <div className="flex items-center gap-2.5">
-                        <span className="text-base text-neutral-700 dark:text-neutral-400 w-28 truncate group-hover/bar:text-neutral-900 dark:group-hover/bar:text-neutral-200 transition-colors">
+                        <span className="text-base text-neutral-700 dark:text-neutral-300 w-28 truncate group-hover/bar:text-neutral-900 dark:group-hover/bar:text-white transition-colors">
                           #{tag.name}
                         </span>
                         <div className="flex-1 h-2 rounded-full bg-neutral-200 dark:bg-neutral-700/50 overflow-hidden">
@@ -327,7 +335,7 @@ export function Dashboard({ stats }: DashboardProps) {
                             style={{ width: `${tag.percent}%` }}
                           />
                         </div>
-                        <span className="text-sm text-neutral-500 dark:text-neutral-500 tabular-nums w-6 text-right">
+                        <span className="text-sm text-neutral-500 dark:text-neutral-400 tabular-nums w-6 text-right">
                           {tag.usageCount}
                         </span>
                       </div>
@@ -335,15 +343,15 @@ export function Dashboard({ stats }: DashboardProps) {
                   ))}
                 </div>
               ) : (
-                <div className="text-base text-neutral-500 dark:text-neutral-500 py-4 text-center">
+                <div className="text-base text-neutral-500 dark:text-neutral-400 py-4 text-center">
                   태그를 추가하면 취향 DNA가 나타납니다
                 </div>
               )}
             </div>
 
             {/* Recent additions */}
-            <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30 p-4">
-              <div className="text-base font-semibold text-neutral-700 dark:text-neutral-400 mb-3 uppercase tracking-wider flex items-center gap-1.5">
+            <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/60 p-4">
+              <div className="text-base font-semibold text-neutral-700 dark:text-neutral-200 mb-3 uppercase tracking-wider flex items-center gap-1.5">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -366,7 +374,7 @@ export function Dashboard({ stats }: DashboardProps) {
                         <div className="text-base text-neutral-800 dark:text-neutral-300 truncate group-hover/recent:text-neutral-900 dark:group-hover/recent:text-neutral-100 transition-colors">
                           {item.title || extractDomain(item.url)}
                         </div>
-                        <div className="text-sm text-neutral-500 dark:text-neutral-500 truncate">
+                        <div className="text-sm text-neutral-500 dark:text-neutral-400 truncate">
                           {extractDomain(item.url)} · {timeAgo(item.capturedAt)}
                         </div>
                       </div>
@@ -374,7 +382,7 @@ export function Dashboard({ stats }: DashboardProps) {
                   ))}
                 </div>
               ) : (
-                <div className="text-base text-neutral-500 dark:text-neutral-500 py-4 text-center">
+                <div className="text-base text-neutral-500 dark:text-neutral-400 py-4 text-center">
                   아직 수집된 레퍼런스가 없습니다
                 </div>
               )}
@@ -382,19 +390,19 @@ export function Dashboard({ stats }: DashboardProps) {
           </div>
 
           {/* Agent insight */}
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/30 p-4 flex items-start gap-3">
+          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-800/60 p-4 flex items-start gap-3">
             <div className="flex-shrink-0 mt-0.5">
               <svg className="h-4 w-4 text-emerald-600 dark:text-emerald-500/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
               </svg>
             </div>
-            <p className="text-base text-neutral-700 dark:text-neutral-400 leading-relaxed">{insight}</p>
+            <p className="text-base text-neutral-700 dark:text-neutral-300 leading-relaxed">{insight}</p>
           </div>
 
           {/* Top tags */}
           {stats.topTags.length > 0 && (
             <div>
-              <div className="text-base font-semibold text-neutral-700 dark:text-neutral-400 mb-3 uppercase tracking-wider">
+              <div className="text-base font-semibold text-neutral-700 dark:text-neutral-200 mb-3 uppercase tracking-wider">
                 자주 사용한 태그
               </div>
               <div className="flex flex-wrap gap-2">
@@ -402,10 +410,10 @@ export function Dashboard({ stats }: DashboardProps) {
                   <Link
                     key={tag.id}
                     href={`/?tag=${tag.name}`}
-                    className="rounded-lg bg-neutral-100 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700/50 px-3 py-1.5 text-base text-neutral-700 dark:text-neutral-400 transition-all hover:bg-neutral-200 dark:hover:bg-neutral-700/50 hover:text-neutral-900 dark:hover:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-600/50"
+                    className="rounded-lg bg-neutral-100 dark:bg-neutral-800/50 border border-neutral-200 dark:border-neutral-700/50 px-3 py-1.5 text-base text-neutral-700 dark:text-neutral-300 transition-all hover:bg-neutral-200 dark:hover:bg-neutral-700/50 hover:text-neutral-900 dark:hover:text-neutral-200 hover:border-neutral-300 dark:hover:border-neutral-600/50"
                   >
                     #{tag.name}
-                    <span className="ml-1.5 text-neutral-500 dark:text-neutral-500 tabular-nums">
+                    <span className="ml-1.5 text-neutral-500 dark:text-neutral-400 tabular-nums">
                       {tag.usageCount}
                     </span>
                   </Link>

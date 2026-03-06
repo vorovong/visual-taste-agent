@@ -169,7 +169,7 @@ export function Header({ pendingCount, onUploadClick }: HeaderProps) {
                 key={tab.key}
                 href={tab.href}
                 className={`relative flex flex-1 flex-col items-center gap-1 py-2.5 min-h-[48px] justify-center transition-colors ${
-                  tab.isActive ? tab.activeColor : "text-neutral-500 dark:text-neutral-500"
+                  tab.isActive ? tab.activeColor : "text-neutral-500 dark:text-neutral-400"
                 }`}
               >
                 {tab.icon}
