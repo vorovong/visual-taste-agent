@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { Suspense } from "react";
 import { db, schema } from "@/lib/db/index";
 import { count, eq, isNull, desc } from "drizzle-orm";

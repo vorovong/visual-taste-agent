@@ -28,6 +28,7 @@
     "tailwindcss": "^4.2.1"
   },
   "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.10",
     "@playwright/test": "^1.58.2",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^25.3.3",
