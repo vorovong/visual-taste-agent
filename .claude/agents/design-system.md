@@ -4,42 +4,39 @@
 
 ## 데이터 소스
 
-### 1차 소스: DB API
+### 1차 소스: SQLite DB 직접 쿼리 (dev 서버 불필요)
 ```bash
-# 전체 평가 데이터 + 메타데이터 JSON 덤프
-curl http://localhost:3000/api/agent/data
+# 전체 레퍼런스
+sqlite3 data/vta.db "SELECT id, url, title, verdict, captured_at, evaluated_at FROM \"references\""
+
+# 좋아하는 것만
+sqlite3 data/vta.db "SELECT r.id, r.url, r.title FROM \"references\" r WHERE r.verdict = 'like'"
+
+# 해시태그 포함
+sqlite3 data/vta.db "SELECT r.url, r.verdict, GROUP_CONCAT(h.name) as tags FROM \"references\" r LEFT JOIN reference_hashtags rh ON r.id = rh.reference_id LEFT JOIN hashtags h ON rh.hashtag_id = h.id GROUP BY r.id"
+
+# 디자인 메타데이터
+sqlite3 data/vta.db "SELECT r.url, dm.colors, dm.fonts, dm.layout FROM \"references\" r JOIN design_metadata dm ON r.id = dm.reference_id"
+
+# 해시태그 풀
+sqlite3 data/vta.db "SELECT name, category, usage_count FROM hashtags ORDER BY usage_count DESC"
+
+# 취향 변경 이력
+sqlite3 data/vta.db "SELECT * FROM taste_log ORDER BY changed_at DESC"
 ```
 
-응답 구조:
-```json
-{
-  "summary": { "total", "pending", "evaluated", "liked", "disliked" },
-  "references": [
-    {
-      "id", "url", "title", "verdict", "capturedAt", "evaluatedAt",
-      "screenshots": [{ "viewport", "path" }],
-      "hashtags": ["미니멀", "볼드"],
-      "metadata": { "colors", "fonts", "layout", "meta" }
-    }
-  ],
-  "hashtags": [{ "id", "name", "category", "usageCount" }],
-  "tasteHistory": [{ "referenceId", "field", "oldValue", "newValue", "changedAt" }]
-}
-```
-
-### 2차 소스: 직접 DB 쿼리
-```bash
-# SQLite DB 직접 쿼리 (읽기 전용)
-sqlite3 data/vta.db "SELECT * FROM \"references\" WHERE verdict = 'like'"
-```
-
-### 3차 소스: 스크린샷 이미지
+### 2차 소스: 스크린샷 이미지
 ```
 public/screenshots/{ref_id}/desktop.png
 public/screenshots/{ref_id}/tablet.png
 public/screenshots/{ref_id}/mobile.png
 ```
 이미지를 읽어서 시각적 분석에 활용한다.
+
+### 3차 소스: 웹앱 API (dev 서버 실행 중일 때만)
+```bash
+curl http://localhost:3000/api/agent/data
+```
 
 ## 산출물 위치
 
@@ -50,9 +47,10 @@ public/screenshots/{ref_id}/mobile.png
 
 ## 세션 시작 시
 
-1. `curl http://localhost:3000/api/agent/data` 또는 DB 직접 쿼리로 데이터 로드
+1. DB 직접 쿼리로 데이터 로드 (`sqlite3 data/vta.db`)
 2. `design-system/profile.md`를 읽어 현재 취향 상태를 파악한다
 3. 레벨을 판단하고 적절한 행동을 한다
+4. 세션 종료 시 `profile.md`를 최신 DB 상태로 갱신한다
 
 ## 레벨 판단 기준
 

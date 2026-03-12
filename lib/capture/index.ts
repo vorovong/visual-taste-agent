@@ -161,7 +161,19 @@ export async function captureUrl(url: string, outputDir: string): Promise<Captur
     await mkdir(outputDir, { recursive: true });
     browser = await puppeteer.launch({
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--disable-software-rasterizer",
+        "--disable-extensions",
+        "--disable-background-networking",
+        "--disable-default-apps",
+        "--disable-sync",
+        "--no-first-run",
+        "--js-flags=--max-old-space-size=128",
+      ],
     });
 
     const savedFiles: string[] = [];
@@ -175,7 +187,8 @@ export async function captureUrl(url: string, outputDir: string): Promise<Captur
       try {
         await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
         await new Promise((r) => setTimeout(r, 1500));
-      } catch {
+      } catch (e) {
+        console.error(`Puppeteer navigation failed for ${url} (${vp.name}):`, e instanceof Error ? e.message : e);
         await page.close();
         continue;
       }
@@ -202,6 +215,7 @@ export async function captureUrl(url: string, outputDir: string): Promise<Captur
 
     return { success: true, files: savedFiles, title, iframeAllowed, metadata };
   } catch (e) {
+    console.error(`Puppeteer capture failed for ${url}:`, e instanceof Error ? e.message : e);
     return {
       success: false,
       error: e instanceof Error ? e.message : String(e),

@@ -285,7 +285,7 @@ export function DetailClient({
                 />
               ) : currentShot ? (
                 <img
-                  src={`/screenshots/${currentShot.path}`}
+                  src={`/api/screenshots/${currentShot.path}`}
                   alt={`${currentViewport} view`}
                   className="w-full"
                 />
@@ -480,6 +480,160 @@ export function DetailClient({
               </div>
             )}
 
+            {/* AI Analysis */}
+            {metadata?.meta?.gemini && (() => {
+              const g = metadata.meta!.gemini as {
+                colors?: { palette?: string[]; mood?: string };
+                typography?: { style?: string; weight?: string };
+                layout?: { type?: string; density?: string };
+                style?: string[];
+                suggestedTags?: string[];
+                summary?: string;
+                strengths?: string[];
+                characteristics?: string[];
+              };
+              return (
+                <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 p-5 space-y-5">
+                  <div className="flex items-center gap-2">
+                    <svg className="h-4 w-4 text-violet-500 dark:text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+                    </svg>
+                    <div className="text-base font-bold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider">
+                      AI 분석
+                    </div>
+                  </div>
+
+                  {/* Color Palette */}
+                  {g.colors?.palette && g.colors.palette.length > 0 && (
+                    <div className="space-y-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base text-neutral-700 dark:text-neutral-400">색상 분위기</span>
+                        {g.colors.mood && (
+                          <span className="rounded-md bg-neutral-100 dark:bg-neutral-800/60 border border-neutral-200 dark:border-neutral-700/50 px-2 py-0.5 text-sm text-neutral-600 dark:text-neutral-400">
+                            {g.colors.mood}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-wrap gap-2.5">
+                        {g.colors.palette.slice(0, 10).map((color, i) => (
+                          <button
+                            key={i}
+                            onClick={() => copyColor(color)}
+                            className="group relative h-10 w-10 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-all hover:scale-110 hover:border-neutral-400 dark:hover:border-neutral-500 hover:shadow-lg"
+                            style={{ backgroundColor: color }}
+                            title={`${color} - 클릭하여 복사`}
+                          >
+                            {copiedColor === color && (
+                              <div className="absolute -top-8 left-1/2 -translate-x-1/2 rounded bg-emerald-600 px-2 py-1 text-[10px] text-white whitespace-nowrap">
+                                복사됨
+                              </div>
+                            )}
+                            <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 hidden group-hover:block rounded bg-neutral-800 px-2 py-1 text-[10px] text-neutral-300 whitespace-nowrap z-10 font-[family-name:var(--font-mono)]">
+                              {color}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Style Tags */}
+                  {g.style && g.style.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="text-base text-neutral-700 dark:text-neutral-400">스타일</div>
+                      <div className="flex flex-wrap gap-2">
+                        {g.style.map((s, i) => (
+                          <span
+                            key={i}
+                            className="rounded-full bg-neutral-100 dark:bg-neutral-800/60 border border-neutral-200 dark:border-neutral-700/50 px-3 py-1 text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                          >
+                            {s}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Typography */}
+                  {g.typography && (g.typography.style || g.typography.weight) && (
+                    <div className="space-y-1.5">
+                      <div className="text-base text-neutral-700 dark:text-neutral-400">타이포그래피</div>
+                      <div className="text-base text-neutral-800 dark:text-neutral-300">
+                        {[g.typography.style, g.typography.weight].filter(Boolean).join(" · ")}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Layout */}
+                  {g.layout && (g.layout.type || g.layout.density) && (
+                    <div className="space-y-1.5">
+                      <div className="text-base text-neutral-700 dark:text-neutral-400">레이아웃</div>
+                      <div className="text-base text-neutral-800 dark:text-neutral-300">
+                        {[g.layout.type, g.layout.density].filter(Boolean).join(" · ")}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Summary */}
+                  {g.summary && (
+                    <div className="space-y-1.5">
+                      <div className="text-base text-neutral-700 dark:text-neutral-400">AI 요약</div>
+                      <p className="text-base text-neutral-800 dark:text-neutral-200 leading-relaxed">
+                        {g.summary}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Strengths */}
+                  {g.strengths && g.strengths.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="text-base text-neutral-700 dark:text-neutral-400">강점</div>
+                      <ul className="space-y-1.5">
+                        {g.strengths.map((s, i) => (
+                          <li key={i} className="flex items-start gap-2 text-base text-neutral-800 dark:text-neutral-300">
+                            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+                            {s}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Characteristics */}
+                  {g.characteristics && g.characteristics.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="text-base text-neutral-700 dark:text-neutral-400">특징</div>
+                      <ul className="space-y-1.5">
+                        {g.characteristics.map((c, i) => (
+                          <li key={i} className="flex items-start gap-2 text-base text-neutral-800 dark:text-neutral-300">
+                            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" />
+                            {c}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Suggested Tags */}
+                  {g.suggestedTags && g.suggestedTags.length > 0 && (
+                    <div className="space-y-2">
+                      <div className="text-base text-neutral-700 dark:text-neutral-400">추천 태그</div>
+                      <div className="flex flex-wrap gap-2">
+                        {g.suggestedTags.map((tag, i) => (
+                          <span
+                            key={i}
+                            className="rounded-full bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 px-3 py-1 text-sm font-medium text-blue-700 dark:text-blue-300"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
             {/* Meta info */}
             <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 p-5 space-y-4">
               <div className="text-base font-bold text-neutral-700 dark:text-neutral-400 uppercase tracking-wider">
@@ -539,7 +693,7 @@ export function DetailClient({
                   <div className="aspect-[16/10] bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
                     {r.screenshotPath ? (
                       <img
-                        src={`/screenshots/${r.screenshotPath}`}
+                        src={`/api/screenshots/${r.screenshotPath}`}
                         alt={r.title || ""}
                         className="h-full w-full object-cover object-top transition-transform group-hover:scale-105"
                       />

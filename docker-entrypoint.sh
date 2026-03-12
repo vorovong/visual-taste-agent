@@ -12,14 +12,22 @@ if [ -z "$STANDALONE_DIR" ]; then
   exit 1
 fi
 
-# Copy static assets into standalone
-cp -r .next/static "$STANDALONE_DIR/.next/static" 2>/dev/null || true
+# Copy static assets into standalone (rm first to avoid nested copy)
+rm -rf "$STANDALONE_DIR/.next/static"
+cp -r .next/static "$STANDALONE_DIR/.next/static"
 mkdir -p "$STANDALONE_DIR/public"
 cp -r public/* "$STANDALONE_DIR/public/" 2>/dev/null || true
 
 # Ensure data directory exists and link DB
 mkdir -p "$STANDALONE_DIR/data"
 ln -sf /app/data/vta.db "$STANDALONE_DIR/data/vta.db" 2>/dev/null || true
+
+# Screenshots on persistent volume — symlink so both bot and web server use the same path
+mkdir -p /app/data/screenshots
+rm -rf /app/public/screenshots
+ln -sf /app/data/screenshots /app/public/screenshots
+rm -rf "$STANDALONE_DIR/public/screenshots"
+ln -sf /app/data/screenshots "$STANDALONE_DIR/public/screenshots"
 
 # Start bot in background
 npx tsx bot/index.ts &

@@ -19,6 +19,9 @@ interface DesignAnalysis {
   style: string[]; // ["modern", "minimal", "dark-theme", ...]
   contentType: string; // "website", "presentation", "poster", "report", "mobile-app", etc.
   suggestedTags: string[];
+  summary: string; // 2-3 sentence Korean design critique/description
+  strengths: string[]; // design strengths in Korean
+  characteristics: string[]; // unique design characteristics in Korean
 }
 
 /**
@@ -43,7 +46,7 @@ export async function analyzeDesign(imagePath: string): Promise<DesignAnalysis |
         ? "image/webp"
         : "image/jpeg";
 
-    const prompt = `Analyze this design image and return ONLY a valid JSON object (no markdown, no backticks) with this exact structure:
+    const prompt = `You are an expert design critic analyzing a screenshot. Examine the visual design carefully and return ONLY a valid JSON object (no markdown, no backticks) with this exact structure:
 {
   "colors": {
     "palette": ["#hex1", "#hex2", ...],
@@ -59,11 +62,18 @@ export async function analyzeDesign(imagePath: string): Promise<DesignAnalysis |
   },
   "style": ["modern", "minimal", ...],
   "contentType": "website" | "presentation" | "poster" | "report" | "mobile-app" | "newsletter" | "other",
-  "suggestedTags": ["tag1", "tag2", ...]
+  "suggestedTags": ["tag1", "tag2", ...],
+  "summary": "한국어로 2-3문장. 디자인 비전공자도 이해할 수 있도록 이 디자인의 전반적인 인상과 특징을 자연스러운 언어로 설명하는 비평.",
+  "strengths": ["한국어로 이 디자인의 장점 1", "장점 2", ...],
+  "characteristics": ["한국어로 이 디자인을 독특하게 만드는 특징 1", "특징 2", ...]
 }
 
-For style array, choose from: modern, minimal, bold, elegant, playful, corporate, editorial, brutalist, retro, futuristic, organic, geometric, dark-theme, light-theme, gradient, flat, skeuomorphic, glassmorphism, neumorphism, colorful, monochrome, serif, sans-serif, handwritten.
-For suggestedTags, provide 3-8 descriptive tags relevant to this design.
+Field instructions:
+- For style array, choose from: modern, minimal, bold, elegant, playful, corporate, editorial, brutalist, retro, futuristic, organic, geometric, dark-theme, light-theme, gradient, flat, skeuomorphic, glassmorphism, neumorphism, colorful, monochrome, serif, sans-serif, handwritten.
+- For suggestedTags, provide 3-8 descriptive tags relevant to this design.
+- For summary: Write 2-3 sentences IN KOREAN. Describe the overall impression and notable design choices in plain language a non-designer can appreciate. Be specific about visual choices (e.g. color usage, spacing, typography feel).
+- For strengths: Write 2-4 items IN KOREAN. Focus on what works well — clarity, visual hierarchy, use of whitespace, color harmony, etc.
+- For characteristics: Write 2-4 items IN KOREAN. Describe what makes this design distinctive or memorable — specific techniques, aesthetic decisions, or stylistic signatures.
 Respond with ONLY the JSON.`;
 
     const result = await model.generateContent([

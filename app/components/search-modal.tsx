@@ -146,7 +146,7 @@ export function SearchModal() {
                 {/* Thumbnail */}
                 {item.screenshot ? (
                   <img
-                    src={`/screenshots/${item.screenshot}`}
+                    src={`/api/screenshots/${item.screenshot}`}
                     alt=""
                     className="h-10 w-16 shrink-0 rounded-md object-cover object-top bg-neutral-100 dark:bg-neutral-800"
                   />

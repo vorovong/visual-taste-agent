@@ -11,6 +11,7 @@ export default auth((req) => {
   const isPublicAsset =
     req.nextUrl.pathname.startsWith("/_next") ||
     req.nextUrl.pathname.startsWith("/screenshots") ||
+    req.nextUrl.pathname.startsWith("/api/screenshots") ||
     req.nextUrl.pathname === "/favicon.ico";
 
   if (isAuthApi || isPublicAsset) return NextResponse.next();

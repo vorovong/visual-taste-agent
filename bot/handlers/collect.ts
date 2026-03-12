@@ -94,6 +94,10 @@ export function registerCollectHandlers(bot: Bot) {
 
     const result = await captureUrl(url, screenshotsDir);
 
+    if (!result.success || result.files.length === 0) {
+      console.error(`Capture failed for ${url}:`, result.error || "no files captured");
+    }
+
     if (result.title || result.iframeAllowed !== undefined) {
       await db
         .update(schema.references)

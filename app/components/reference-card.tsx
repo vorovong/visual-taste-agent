@@ -75,7 +75,7 @@ export function ReferenceCard({
           )}
           {displayShot ? (
             <img
-              src={`/screenshots/${displayShot.path}`}
+              src={`/api/screenshots/${displayShot.path}`}
               alt={title || url}
               loading="lazy"
               className={`h-full w-full object-cover object-top transition-all duration-500 group-hover:scale-105 ${

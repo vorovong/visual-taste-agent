@@ -34,7 +34,7 @@ function getScreenshot(ref: PendingRef): string | null {
   const tablet = ref.screenshots.find((s) => s.viewport === "tablet");
   const mobile = ref.screenshots.find((s) => s.viewport === "mobile");
   const ss = desktop || tablet || mobile || ref.screenshots[0];
-  return ss ? ss.path : null;
+  return ss ? `/api/screenshots/${ss.path}` : null;
 }
 
 function getDomain(url: string): string {
